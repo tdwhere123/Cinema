@@ -1,0 +1,15 @@
+index.html
+*.md
+assets/
+.do-it/
+vendor/
+dist/
+docs/evidence/
+package-lock.json
+node_modules/
+.codegraph/
+*.webp
+*.png
+*.woff2
+*.svg
+.git/

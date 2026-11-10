@@ -1,0 +1,14 @@
+node_modules/
+/.codegraph/
+dist/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# Local originals, plans, research and browser evidence
+.do-it/

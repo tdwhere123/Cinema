@@ -1,0 +1,22 @@
+{
+  "name": "cinema-film-club",
+  "version": "2.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "posters": "node scripts/posters.mjs",
+    "test:browser": "node tests/restoration.browser.mjs && node tests/fidelity.browser.mjs && node tests/content.browser.mjs && node tests/redesign.browser.mjs",
+    "test:static": "node scripts/verify-static.mjs",
+    "format": "prettier --write \"src/**/*.js\" \"src/**/*.css\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" server.mjs",
+    "format:check": "prettier --check \"src/**/*.js\" \"src/**/*.css\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" server.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2",
+    "prettier": "3.9.10",
+    "sharp": "^0.35.5"
+  }
+}

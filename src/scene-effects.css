@@ -1,0 +1,12 @@
+/* Hand-drawn outline lives on the disc group, not on the spinning artwork. */
+#scene .css-disc > .disc-scribble {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 116.364%;
+  height: 116.364%;
+  transform: translate(-50%, -50%) translateZ(2px);
+  pointer-events: none;
+  backface-visibility: visible;
+  opacity: 1;
+}

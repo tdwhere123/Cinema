@@ -1,0 +1,294 @@
+/* 独立的自定义播放器皮肤。开关裁切近似原站节奏，不冒充其噪声 shader。 */
+.player-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+#trailer-dialog {
+  --player-ui: 1;
+}
+#trailer-dialog #trailer-player {
+  inset: 7vh 0 12vh;
+}
+.trailer-controls {
+  position: absolute;
+  z-index: 4;
+  bottom: 7vh;
+  left: 3vw;
+  right: 3vw;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 36px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  opacity: var(--player-ui);
+  transition: opacity 0.35s;
+}
+.trailer-controls[hidden] {
+  display: none;
+}
+.trailer-controls button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 8px 0;
+}
+.trailer-controls button:focus-visible,
+.trailer-controls input:focus-visible {
+  outline: 1px solid white;
+  outline-offset: 5px;
+}
+.trailer-time {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.trailer-seek {
+  flex: 1;
+  position: relative;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+.trailer-seek input,
+.trailer-volume input {
+  width: 100%;
+  accent-color: white;
+  cursor: pointer;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+.trailer-volume {
+  width: 75px;
+  display: flex;
+  align-items: center;
+}
+.trailer-buffer {
+  position: absolute;
+  left: 0;
+  top: 11px;
+  right: 0;
+  height: 2px;
+  background: #ffffff55;
+  transform: scaleX(var(--buffer, 0));
+  transform-origin: left;
+  pointer-events: none;
+}
+.trailer-status {
+  position: absolute;
+  bottom: 11vh;
+  left: 3vw;
+  right: 3vw;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ddd;
+  z-index: 3;
+  pointer-events: none;
+}
+.trailer-status:empty {
+  display: none;
+}
+#trailer-dialog .trailer-top,
+#trailer-dialog .trailer-bottom {
+  opacity: var(--player-ui);
+  transition: opacity 0.35s;
+}
+#trailer-dialog.player-idle:not(:focus-within) {
+  --player-ui: 0;
+  cursor: none;
+}
+.trailer-controls:hover,
+.trailer-controls:focus-within {
+  opacity: 1;
+}
+#trailer-dialog.player-opening {
+  animation: none;
+}
+#trailer-dialog.player-opening #trailer-player {
+  animation: trailer-video-in 0.5s 0.8s both;
+}
+#trailer-dialog.player-opening .trailer-controls {
+  animation: trailer-ui-in 0.6s 1s both;
+}
+#trailer-dialog.player-closing {
+  animation: none;
+  pointer-events: none;
+}
+#trailer-dialog.player-buffering .trailer-seek:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 20%;
+  height: 1px;
+  background: white;
+  animation: buffer-sweep 1s linear infinite;
+}
+@keyframes trailer-video-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes trailer-ui-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: var(--player-ui, 1);
+    transform: translateY(0);
+  }
+}
+@keyframes buffer-sweep {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+@media (max-width: 600px) {
+  .trailer-controls {
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 9px;
+    bottom: 7vh;
+  }
+  .trailer-seek {
+    order: -1;
+    flex-basis: 100%;
+  }
+  .trailer-volume {
+    width: 50px;
+  }
+  .trailer-controls [data-action='fullscreen'] {
+    margin-left: auto;
+  }
+  .trailer-time {
+    margin-right: auto;
+  }
+  #trailer-dialog #trailer-player {
+    inset: 12vh 0 20vh;
+  }
+  .trailer-status {
+    bottom: 22vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #trailer-dialog.player-opening,
+  #trailer-dialog.player-closing,
+  #trailer-dialog.player-opening #trailer-player,
+  #trailer-dialog.player-opening .trailer-controls {
+    animation: none;
+  }
+  .trailer-controls,
+  #trailer-dialog .trailer-top,
+  #trailer-dialog .trailer-bottom {
+    transition: none;
+  }
+}
+
+/* 缓冲不是播放：保留可见状态、暂停及外链，不强迫跳转。 */
+#trailer-dialog.player-buffering {
+  --player-ui: 1;
+  cursor: auto;
+}
+.trailer-controls [data-action='play'][aria-busy='true'] {
+  min-width: 7.5em;
+}
+.player-buffering .trailer-status {
+  background: #090909cc;
+  padding: 8px 12px;
+  border-radius: 2px;
+}
+
+/* 从真实 WATCH TRAILER 边界启动；450ms 线条合拢后矩形扩张 1050ms。 */
+#trailer-dialog {
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+}
+#trailer-dialog::backdrop {
+  background: transparent;
+}
+#trailer-dialog.player-launching {
+  background: transparent;
+}
+#trailer-dialog.player-launching > :not(.trailer-launch-frame) {
+  visibility: hidden;
+}
+.trailer-launch-frame {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  display: none;
+  overflow: hidden;
+}
+.player-launching .trailer-launch-frame {
+  display: block;
+}
+.trailer-launch-frame i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: currentColor;
+  transform: scaleY(0.08);
+  animation: trailer-lines-in 0.45s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.trailer-launch-frame i:first-child {
+  top: 0;
+  transform-origin: top;
+}
+.trailer-launch-frame i:last-child {
+  bottom: 0;
+  transform-origin: bottom;
+}
+#trailer-dialog.player-opening #trailer-player {
+  transform-origin: center;
+  animation:
+    trailer-stage-in 1.05s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both,
+    trailer-video-in 0.5s 0.8s both;
+}
+#trailer-dialog.player-opening .trailer-top,
+#trailer-dialog.player-opening .trailer-bottom {
+  animation: trailer-ui-in 0.6s 1s both;
+}
+@keyframes trailer-lines-in {
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes trailer-stage-in {
+  from {
+    scale: 0.94;
+  }
+  to {
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #trailer-dialog.player-opening #trailer-player,
+  #trailer-dialog.player-opening .trailer-top,
+  #trailer-dialog.player-opening .trailer-bottom {
+    animation: none;
+  }
+  .trailer-launch-frame {
+    display: none !important;
+  }
+}

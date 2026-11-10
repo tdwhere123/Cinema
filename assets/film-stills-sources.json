@@ -1,0 +1,41 @@
+{
+  "retrieved": "2026-11-09",
+  "images": [
+    {
+      "film": "possible-love",
+      "file": "assets/possible-love/still-1.webp",
+      "sourcePage": "https://www.netflix.com/tudum/articles/possible-love-cast-release-date-photos",
+      "sourceImage": "https://dnm.nflximg.net/api/v6/s0XAg4q_jvYbSSbLvySyUsliNSg/AAAAQSrCBcfooVj8IOOfxTpzBghILVXpZDHpD4FwB1jQOMluSNcYztxxgCrPvGSae6N0hbHjPPkeJxETc29a3mR5dO-NC1Zf10pGCzoQPaf0auVNdzzSHFtvXPoexRIlUcZ-Pbr7cSZVyT1CsqUCXBCNJD-0ToY.jpg?r=6f2",
+      "sourceAlt": "A man, woman, and boy stand together inside a house, looking out of an open window. The setting appears domestic with light from outside illuminating their faces. They seem calm and contemplative.",
+      "identity": "Image in the named film’s official article/gallery; not related-content cards or poster.",
+      "rights": "Film publicity photograph. Copyright belongs to original rights holders. User authorized local download; redistribution/public deployment permission not established."
+    },
+    {
+      "film": "possible-love",
+      "file": "assets/possible-love/still-2.webp",
+      "sourcePage": "https://www.netflix.com/tudum/articles/possible-love-cast-release-date-photos",
+      "sourceImage": "https://dnm.nflximg.net/api/v6/s0XAg4q_jvYbSSbLvySyUsliNSg/AAAAQeNs5kZziGQQumoBbcGvCLlWhTUFiwGQzuKI9xovEmuJJdKaAFqabwDq6HSdXwfTBUJ7nyXrVDWKnQ7jRdUtYbyS9tYm33QuLKfaTVR6EDW9igiMcPFy8vUo3MZLhQllWBPlRh7QwzabCgPvGC1gdWqKgQM.jpg?r=f8c",
+      "sourceAlt": "Two people sit at a stone table outdoors at night, surrounded by trees and plants, with snacks, a bottle, and a glass on the table, looking upward as if observing something in the sky.",
+      "identity": "Image in the named film’s official article/gallery; not related-content cards or poster.",
+      "rights": "Film publicity photograph. Copyright belongs to original rights holders. User authorized local download; redistribution/public deployment permission not established."
+    },
+    {
+      "film": "poetry",
+      "file": "assets/poetry/still-1.webp",
+      "sourcePage": "https://www.festival-cannes.com/en/f/poetry/",
+      "sourceImage": "https://cdn.festival-cannes.com/media/uploads/2023/03/69486-scaled.jpg",
+      "sourceAlt": "POETRY",
+      "identity": "Image in the named film’s official article/gallery; not related-content cards or poster.",
+      "rights": "Film publicity photograph. Copyright belongs to original rights holders. User authorized local download; redistribution/public deployment permission not established."
+    },
+    {
+      "film": "poetry",
+      "file": "assets/poetry/still-2.webp",
+      "sourcePage": "https://www.festival-cannes.com/en/f/poetry/",
+      "sourceImage": "https://cdn.festival-cannes.com/media/uploads/2023/03/69484-scaled.jpg",
+      "sourceAlt": "POETRY",
+      "identity": "Image in the named film’s official article/gallery; not related-content cards or poster.",
+      "rights": "Film publicity photograph. Copyright belongs to original rights holders. User authorized local download; redistribution/public deployment permission not established."
+    }
+  ]
+}

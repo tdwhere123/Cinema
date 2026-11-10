@@ -1,0 +1,1612 @@
+/* Local OFL Noto subsets; source and license in assets/fonts. */
+@font-face {
+  font-family: Eiko;
+  src: url('../assets/fonts/cinema-serif.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: Montreal;
+  src: url('../assets/fonts/cinema-sans.woff2') format('woff2');
+  font-display: swap;
+}
+:root {
+  --paper: #f6f6f3;
+  --ink: #080808;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Montreal, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: clamp(11px, 0.9vw, 17px);
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid #4e8bc2;
+  outline-offset: 5px;
+}
+[hidden] {
+  display: none !important;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1,
+h2,
+h3 {
+  font-family: Eiko, 'Songti SC', 'SimSun', serif;
+  font-weight: 400;
+}
+#grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: url('../assets/grain.svg');
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.eyebrow {
+  font-family: Eiko, serif;
+  font-size: 0.55em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+#nav {
+  position: fixed;
+  top: 0.8em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+#nav a,
+#nav button {
+  position: relative;
+}
+#nav a:after {
+  position: absolute;
+  content: '';
+  width: 3px;
+  height: 3px;
+  left: 50%;
+  bottom: -0.6em;
+  transform: scale(0);
+  background: currentColor;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+#nav a.current:after {
+  transform: scale(1);
+}
+#nav .logo:after {
+  display: none;
+}
+.logo {
+  width: 2.1em;
+  display: block;
+  margin-right: 0.1em;
+}
+.logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+#nav a:not(.logo):before {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+  opacity: 0;
+}
+#nav a:hover span {
+  opacity: 0.6;
+}
+#index-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+#index-button svg {
+  width: 0.8em;
+  height: 0.6em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  transition: transform 0.4s;
+}
+#index-button[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+#nav.light {
+  color: white;
+}
+#nav.light .logo img {
+  filter: invert(1);
+}
+#gallery {
+  height: 100svh;
+  min-height: 480px;
+  position: relative;
+  overflow: hidden;
+}
+#film-info {
+  position: absolute;
+  left: 0.45em;
+  top: 0.5em;
+  width: 20.8vw;
+  min-width: 230px;
+  z-index: 10;
+  pointer-events: none;
+}
+#film-info h2 {
+  font-size: 2.3vw;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+  padding-bottom: 0.2em;
+}
+#film-info dl {
+  margin: 0;
+}
+#film-info dl div {
+  border-top: 1px solid;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.23em 0;
+  gap: 1em;
+}
+#film-info dt {
+  font-family: Eiko, serif;
+  letter-spacing: 0.2em;
+  font-size: 0.5em;
+  padding-top: 0.25em;
+}
+#film-info dd {
+  margin: 0;
+  text-align: right;
+  line-height: 1.4;
+}
+#film-info.fresh h2 {
+  animation: reveal-line 0.65s var(--ease);
+}
+#film-info.fresh dl {
+  animation: rise 0.55s var(--ease);
+}
+#scene {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  outline: none;
+  cursor: grab;
+}
+#scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#reviews {
+  position: absolute;
+  bottom: 3.5vh;
+  left: 18%;
+  right: 18%;
+  display: flex;
+  justify-content: center;
+  gap: 3vw;
+  pointer-events: none;
+}
+.review {
+  max-width: 30vw;
+  text-align: center;
+  flex: 1;
+  animation: rise 0.7s var(--ease);
+}
+.review-stars {
+  font-size: 1em;
+  letter-spacing: 0.09em;
+  margin-bottom: 1.25em;
+}
+.review .eyebrow {
+  font-size: 0.45em;
+}
+.review h3 {
+  font-size: 1.62vw;
+  text-transform: uppercase;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  margin-top: 0.35em;
+}
+#gallery-access {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1vh;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.4em;
+  font-size: 9px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#gallery-access:focus-within,
+#gallery:hover #gallery-access {
+  opacity: 0.55;
+}
+#gallery-access button {
+  padding: 3px;
+}
+#index-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #0005;
+  animation: fade 0.3s;
+}
+#index-panel {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 23.5vw;
+  min-width: 270px;
+  transform: translateX(-50%);
+  padding: 4.3em 4.9em 2em;
+  background: white;
+  z-index: 55;
+  animation: dropdown 0.55s var(--ease);
+}
+#index-list {
+  max-height: 23vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: black #d5d4cf;
+}
+#index-list button {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1.5em;
+  padding: 0.35em 0.2em;
+  text-align: left;
+  white-space: nowrap;
+}
+#index-list button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#index-list small {
+  font: inherit;
+  opacity: 0;
+}
+#index-list button:hover,
+#index-list button.active {
+  background: black;
+  color: white;
+}
+#index-list button.active small,
+#index-list button:hover small {
+  opacity: 1;
+}
+/* CSS 退化路径也使用 3D 空间：父容器倾斜，子圆盘沿弧线排列。 */
+.css-stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1000px;
+  overflow: hidden;
+}
+.css-world {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+  transform: rotateX(30deg) rotateY(-30deg);
+}
+.css-disc {
+  position: absolute;
+  transform-style: preserve-3d;
+  width: var(--diameter);
+  height: var(--diameter);
+  margin-left: calc(var(--diameter) * -0.5);
+  margin-top: calc(var(--diameter) * -0.5);
+  border-radius: 50%;
+  will-change: transform;
+}
+.css-spin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.css-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  background-size: cover;
+  background-position: center;
+  mask-image: radial-gradient(circle, transparent 0 7%, black 7.2%);
+  box-shadow:
+    inset 0 0 0 2px #cad0d1,
+    inset 0 0 0 4px #fff8;
+}
+.css-face.front {
+  transform: translateZ(1px);
+}
+.css-face.back {
+  transform: rotateY(180deg) translateZ(1px);
+  background:
+    repeating-radial-gradient(circle, transparent 0 1px, #ffffff22 1px 2px),
+    conic-gradient(
+      #d4e5f0,
+      #dbbfdd,
+      #f2e3b4,
+      #adcfbd,
+      #e2ebef,
+      #c4c0db,
+      #d4e5f0
+    );
+}
+.css-face:after {
+  content: '';
+  position: absolute;
+  inset: 38%;
+  border-radius: 50%;
+  border: 1px solid #c7cdcc;
+  background: radial-gradient(
+    circle,
+    transparent 0 28%,
+    #929a9f77 30% 40%,
+    #e9edf0aa 41% 63%,
+    #aeb8be77 64% 68%,
+    transparent 69%
+  );
+  box-shadow: 0 0 0 1px #fff8;
+}
+.css-face.front:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    120deg,
+    transparent 25%,
+    #fff2 40%,
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+}
+.css-disc.active .css-face {
+  box-shadow:
+    inset 0 0 0 2px #b4bcc0,
+    inset 0 0 0 4px #fff8;
+}
+.css-disc:after {
+  content: '';
+  position: absolute;
+  inset: -3%;
+  border: 1.4px solid #111;
+  border-radius: 49% 51% 47% 53%;
+  opacity: 0;
+  transform: translateZ(3px) rotate(-8deg);
+  transition: opacity 0.2s;
+}
+.css-disc:hover:after {
+  opacity: 0.7;
+}
+#cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #91c8f777, transparent 70%);
+  filter: blur(1px);
+  opacity: 0;
+}
+#cursor span {
+  display: none;
+}
+#detail {
+  padding-top: 16vh;
+}
+.detail-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 5vw;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  max-width: 85vw;
+  margin: 0 auto 0.15em;
+  animation: reveal-line 0.9s var(--ease);
+}
+.detail-info {
+  padding: 0 0.45em;
+}
+.credits {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding: 0.5em 0;
+  font-size: 0.9em;
+}
+.credits .eyebrow {
+  font-size: 0.55em;
+  margin-left: 0.75em;
+}
+.detail-metadata {
+  margin-top: 1.2em;
+}
+.detail-metadata div {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid;
+  padding: 0.26em 0;
+}
+.detail-metadata .eyebrow {
+  font-size: 0.48em;
+}
+.detail-cta {
+  height: 61vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8em;
+}
+.corner {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.8em;
+  line-height: 1;
+}
+.corner.tl {
+  top: 25%;
+  left: 0;
+}
+.corner.tr {
+  top: 25%;
+  right: 0;
+}
+.corner.bl {
+  bottom: 0;
+  left: 0;
+}
+.corner.br {
+  bottom: 0;
+  right: 0;
+}
+.rule-link {
+  font-family: Eiko, serif;
+  text-transform: uppercase;
+  font-size: 2.1vw;
+  letter-spacing: -0.06em;
+  line-height: 1.1;
+  border-top: 4px solid;
+  border-bottom: 4px solid;
+  padding: 0.2em 0 0.1em;
+  overflow: hidden;
+  position: relative;
+}
+.rule-link span {
+  display: inline-block;
+  transition: transform 0.45s var(--ease);
+}
+.rule-link:hover span {
+  transform: translateY(-5%);
+}
+.trailer-section {
+  height: 135vh;
+  position: relative;
+  margin-top: -8vh;
+}
+.trailer-sticky {
+  height: 100svh;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+.trailer-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  clip-path: polygon(
+    25% 8%,
+    32% 6%,
+    40% 9%,
+    48% 5%,
+    56% 8%,
+    65% 4%,
+    75% 9%,
+    80% 32%,
+    77% 60%,
+    80% 83%,
+    66% 94%,
+    48% 89%,
+    33% 95%,
+    23% 85%,
+    20% 60%,
+    22% 30%
+  );
+  will-change: clip-path, transform;
+}
+.trailer-copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  padding: 10vw;
+  mix-blend-mode: normal;
+}
+.trailer-copy h2 {
+  font-size: 6vw;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  max-width: 900px;
+}
+.trailer-copy .rule-link {
+  margin-top: 1.5em;
+  font-size: 1.8vw;
+}
+.description-section {
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  min-height: 85vh;
+  padding: 1em 0.45em 8vh;
+  gap: 8vw;
+}
+.description-copy {
+  font-size: 1.55vw;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.description-note {
+  font-size: 0.9em;
+  line-height: 1.55;
+  max-width: 580px;
+  padding-top: 1em;
+  color: #555;
+}
+.description-note .eyebrow {
+  font-size: 0.6em;
+  margin-bottom: 1em;
+}
+.next-section {
+  min-height: 110vh;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.next-section h2 {
+  font-size: 12vw;
+  line-height: 0.85;
+  text-transform: uppercase;
+  letter-spacing: -0.07em;
+  max-width: 95vw;
+}
+.next-disc {
+  width: 35vw;
+  max-width: 500px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  mask-image: radial-gradient(circle, transparent 0 7%, black 7.2%);
+  transform: perspective(900px) rotateX(16deg) rotateY(-30deg);
+  margin-top: 7vh;
+  transition: transform 0.7s var(--ease);
+}
+.next-section:hover .next-disc {
+  transform: perspective(900px) rotateX(5deg) rotateY(-15deg) rotateZ(10deg);
+}
+.next-kicker {
+  margin-bottom: 4vh;
+  font-size: 0.6em;
+  letter-spacing: 0.2em;
+}
+.detail-footer {
+  position: absolute;
+  bottom: 1em;
+  left: 0;
+  width: 100%;
+  font-size: 0.7em;
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.85s var(--ease),
+    transform 0.85s var(--ease);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease);
+}
+.reveal-rule.visible {
+  transform: scaleX(1);
+}
+#transition {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+.transition-disc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(52vh, 50vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-size: cover;
+  mask-image: radial-gradient(circle, transparent 0 7%, black 7.2%);
+  transform: translate(-50%, -50%) rotateY(0deg);
+}
+#transition.active {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+#transition.active .transition-disc {
+  animation: disc-transition 0.7s var(--ease) both;
+}
+#transition.leaving {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+/* Transparent counter shares the stage with the rising lead disc. */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  --load-rise: 0;
+}
+.load-count {
+  position: absolute;
+  top: calc(88svh - var(--load-rise) * 67svh);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  font-family: Eiko, serif;
+  font-size: 5vw;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: top 0.12s linear;
+}
+.load-cell {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+  min-width: 0.62em;
+}
+.load-strip {
+  display: block;
+  white-space: pre;
+  line-height: 1;
+  transform: translateY(calc(var(--digit) * -1em));
+  animation: load-roll 0.6s var(--ease) both;
+}
+.load-side {
+  position: absolute;
+  top: 50%;
+  font-size: 1em;
+  overflow: hidden;
+  transition:
+    transform 0.5s,
+    opacity 0.5s;
+}
+.load-left {
+  left: 0.5em;
+}
+.load-right {
+  right: 0.5em;
+}
+#preloader.releasing .load-cell {
+  transform: translateY(-120%);
+  opacity: 0;
+  transition:
+    transform 0.5s var(--ease),
+    opacity 0.5s;
+}
+#preloader.releasing .load-side {
+  transform: translateY(-120%);
+  opacity: 0;
+}
+#preloader.done {
+  visibility: hidden;
+}
+.loading #film-info,
+.loading #reviews,
+.loading #gallery-access {
+  visibility: hidden;
+}
+.loading #nav {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading .text-line-rise,
+.loading .review {
+  animation-play-state: paused;
+}
+#film-info,
+#reviews {
+  transition:
+    opacity 0.45s,
+    translate 0.55s;
+}
+#scene:focus-visible {
+  outline: 1px solid #4e8bc2;
+  outline-offset: -5px;
+}
+@keyframes load-roll {
+  from {
+    transform: translateY(1em);
+  }
+  to {
+    transform: translateY(calc(var(--digit) * -1em));
+  }
+}
+@media (max-width: 767px) {
+  .load-count {
+    font-size: 12vw;
+  }
+  .load-side {
+    display: none;
+  }
+}
+#study-button {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 65;
+  font: 10px Arial;
+  opacity: 0.35;
+  width: 18px;
+  height: 18px;
+  border: 1px solid;
+  border-radius: 50%;
+}
+dialog {
+  border: 0;
+  padding: 40px;
+  background: var(--paper);
+  color: var(--ink);
+  width: min(600px, 90vw);
+  max-height: 85svh;
+}
+dialog::backdrop {
+  background: #0009;
+  backdrop-filter: blur(4px);
+}
+dialog h2 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin: 20px 0;
+}
+dialog p {
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+dialog a {
+  display: inline-block;
+  margin: 10px 15px 0 0;
+  border-bottom: 1px solid;
+}
+.close-dialog {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.close-dialog[aria-label] {
+  font: 28px Arial;
+}
+#trailer-dialog {
+  width: 100vw;
+  height: 100svh;
+  max-height: none;
+  max-width: none;
+  padding: 0;
+  background: #090909;
+  color: white;
+  overflow: hidden;
+}
+#trailer-player {
+  position: absolute;
+  inset: 8vh 0;
+}
+#trailer-player iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.trailer-top,
+.trailer-bottom {
+  position: absolute;
+  left: 2em;
+  right: 2em;
+  display: flex;
+  justify-content: space-between;
+  z-index: 3;
+  font-size: 11px;
+}
+.trailer-top {
+  top: 2em;
+}
+.trailer-bottom {
+  bottom: 2em;
+}
+.trailer-top .close-dialog {
+  position: static;
+}
+.trailer-bottom a {
+  margin: 0;
+  border: 0;
+}
+@keyframes reveal-line {
+  from {
+    clip-path: inset(100% 0 0);
+    transform: translateY(0.4em);
+  }
+  to {
+    clip-path: inset(0);
+    transform: none;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dropdown {
+  from {
+    clip-path: inset(0 0 100%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes disc-transition {
+  0% {
+    transform: translate(-50%, -50%) rotateY(-30deg) rotateX(30deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotateY(90deg) rotateX(0) scale(1.45);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateY(180deg) rotateX(0) scale(0.05);
+  }
+}
+@keyframes load-logo {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (max-width: 767px) {
+  body {
+    font-size: 12px;
+  }
+  #nav {
+    top: 15px;
+    gap: 20px;
+  }
+  #film-info {
+    top: 57px;
+    left: 10px;
+    width: 55vw;
+    min-width: 0;
+  }
+  #film-info h2 {
+    font-size: 7vw;
+  }
+  #film-info dd {
+    font-size: 11px;
+  }
+  #reviews {
+    left: 8%;
+    right: 8%;
+    bottom: 6vh;
+    gap: 6vw;
+  }
+  .review {
+    max-width: 84vw;
+  }
+  .review:nth-child(2) {
+    display: none;
+  }
+  .review h3 {
+    font-size: 5vw;
+  }
+  .review .eyebrow {
+    font-size: 7px;
+  }
+  .review-stars {
+    margin-bottom: 10px;
+  }
+  #index-panel {
+    width: 290px;
+    padding: 60px 48px 25px;
+  }
+  #index-list {
+    max-height: 35vh;
+  }
+  #gallery-access {
+    bottom: 2vh;
+    opacity: 0.65;
+  }
+  .detail-title {
+    font-size: 12vw;
+    max-width: 95vw;
+  }
+  .detail-info {
+    padding: 0 8px;
+  }
+  .credits {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .detail-cta {
+    height: 50vh;
+    gap: 10px;
+  }
+  .rule-link {
+    font-size: 5vw;
+    border-width: 3px;
+  }
+  .trailer-section {
+    height: 120vh;
+    margin-top: -5vh;
+  }
+  .trailer-copy {
+    padding: 10vw 6vw;
+  }
+  .trailer-copy h2 {
+    font-size: 12vw;
+  }
+  .trailer-copy .rule-link {
+    font-size: 5vw;
+  }
+  .description-section {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    min-height: 55vh;
+    padding: 25px 10px 60px;
+  }
+  .description-copy {
+    font-size: 25px;
+    max-width: 90vw;
+  }
+  .description-note {
+    font-size: 12px;
+    max-width: 85vw;
+  }
+  .next-section {
+    min-height: 85vh;
+  }
+  .next-section h2 {
+    font-size: 17vw;
+  }
+  .next-disc {
+    width: 65vw;
+  }
+  .next-kicker {
+    font-size: 8px;
+  }
+  #cursor {
+    display: none;
+  }
+  dialog {
+    padding: 35px 25px;
+  }
+  .detail-footer {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal,
+  .reveal-rule {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 对照 1180px 参考视口后的尺寸校正。 */
+body {
+  font-size: clamp(10px, 0.833333vw, 17px);
+}
+#detail {
+  padding-top: 5vw;
+}
+.detail-title {
+  height: 10vw;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  max-width: 70vw;
+  margin-bottom: 0.15em;
+}
+.detail-title span {
+  max-width: 17ch;
+}
+.detail-cta {
+  height: 46vh;
+  margin-top: 16vh;
+}
+.corner.tl,
+.corner.tr {
+  top: 0;
+}
+.trailer-section {
+  height: 124vh;
+  margin-top: -21vh;
+}
+.description-section {
+  grid-template-columns: 1fr 1fr;
+  gap: 1.66vw;
+  min-height: 0;
+  padding: 1em 0.45em 0;
+}
+.description-copy {
+  max-width: 28ch;
+  font-size: 1.55vw;
+  line-height: 1.04;
+}
+.awards {
+  max-width: 36vw;
+  font-size: 0.9em;
+  line-height: 1.35;
+  display: flex;
+  justify-content: center;
+  align-content: start;
+  align-items: baseline;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  margin: auto;
+}
+.awards .award-label {
+  font-family: Eiko, serif;
+  font-size: 0.55em;
+  letter-spacing: 0.13em;
+}
+.description-vector {
+  grid-column: 1;
+  width: 49vw;
+  height: 20vw;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.description-vector img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: left bottom;
+}
+.next-section {
+  min-height: 124vh;
+}
+.next-section h2 {
+  font-size: 10vw;
+}
+.next-disc {
+  width: 30vw;
+}
+.synopsis-credit {
+  font-size: 8px;
+  opacity: 0.4;
+  line-height: 1.5;
+  margin-top: 20px;
+}
+@media (max-width: 767px) {
+  body {
+    font-size: 12px;
+  }
+  #detail {
+    padding-top: 75px;
+  }
+  .detail-title {
+    height: 24vw;
+    font-size: 12vw;
+    max-width: 95vw;
+  }
+  .detail-cta {
+    height: 45vh;
+    margin-top: 10vh;
+  }
+  .trailer-section {
+    height: 115vh;
+    margin-top: -10vh;
+  }
+  .description-section {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 20px 10px 0;
+  }
+  .description-copy {
+    font-size: 25px;
+  }
+  .awards {
+    max-width: 85vw;
+    margin: 0 auto;
+    font-size: 12px;
+    gap: 8px;
+  }
+  .description-vector {
+    width: 90vw;
+    height: 40vw;
+  }
+  .next-section {
+    min-height: 100vh;
+  }
+  .next-section h2 {
+    font-size: 16vw;
+  }
+  .next-disc {
+    width: 65vw;
+  }
+}
+.detail-title {
+  margin-bottom: 0;
+  outline: none;
+}
+.credits {
+  row-gap: 0;
+  padding: 0.4em 0;
+  line-height: 1.15;
+}
+.credit-group.cast {
+  flex-basis: 100%;
+  text-align: center;
+}
+.credits .eyebrow {
+  margin-left: 0;
+}
+.review-stars {
+  display: flex;
+  justify-content: center;
+}
+.rating-star {
+  width: 1em;
+  height: 1em;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    to right,
+    currentColor var(--fill),
+    transparent var(--fill)
+  );
+  clip-path: polygon(
+    50% 0,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 94%,
+    50% 72%,
+    21% 94%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+.trailer-sticky {
+  position: relative;
+  height: 100%;
+}
+.trailer-picture {
+  height: 158%;
+  top: -29%;
+}
+.trailer-copy h2 {
+  max-width: 12ch;
+}
+.trailer-copy {
+  justify-content: center;
+}
+
+/* 页底继续滚动蓄力，而非抵达底部立即跳页。 */
+.next-progress {
+  height: 2px;
+  width: 90px;
+  background: #2222;
+  position: relative;
+  margin: 14px 0 8px;
+}
+.next-progress:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform: scaleX(var(--advance, 0));
+  transform-origin: left;
+}
+.next-hint {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+.next-section .next-disc {
+  transform: perspective(900px) translateY(calc(var(--advance, 0) * -25px))
+    rotateX(16deg) rotateY(calc(-30deg + var(--advance, 0) * 90deg));
+  transition: transform 0.12s linear;
+}
+.next-section.advancing .next-disc {
+  transform: perspective(900px) translateY(-40vh) rotateY(330deg) scale(1.3);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .next-section.advancing .next-disc {
+    transition: none;
+  }
+}
+
+/* 展架保留自身场景退场，详情独立淡入，不再盖统一假光盘。 */
+.gallery-exiting #film-info,
+.gallery-exiting #reviews,
+.gallery-exiting #gallery-access {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.45s,
+    transform 0.55s;
+}
+.detail-exiting {
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.detail-entering {
+  animation: none;
+}
+@keyframes detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.route-changing #scene {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-entering {
+    animation: none;
+  }
+  .detail-exiting,
+  .gallery-exiting #film-info,
+  .gallery-exiting #reviews {
+    transition: none;
+  }
+}
+
+/* 首屏白色前景与底层预告图重叠，噪声mask施加在白底而非图片。 */
+.detail-info {
+  position: relative;
+  z-index: 2;
+  background: var(--paper, #f4f5ef);
+  padding-bottom: 45vh;
+  pointer-events: none;
+}
+.detail-info a {
+  pointer-events: auto;
+}
+.detail-info.dissolve-active {
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+.trailer-section {
+  z-index: 1;
+  margin-top: -65vh;
+}
+.trailer-picture {
+  clip-path: none !important;
+}
+.trailer-copy {
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-info {
+    padding-bottom: 0;
+  }
+  .trailer-section {
+    margin-top: 0;
+  }
+}
+.next-section .next-disc {
+  transition: none;
+  will-change: transform;
+}
+
+/* 文字逐行遮罩、细线展开与十字弹出，避免只有整体淡入。 */
+.text-line-mask {
+  display: block;
+  overflow: hidden;
+}
+.text-line-rise {
+  display: block;
+  animation: line-rise 0.7s cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation-delay: calc(var(--line-delay, 0s) + var(--row-delay, 0s));
+}
+@keyframes line-rise {
+  from {
+    transform: translateY(120%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.detail-info .credits {
+  animation: detail-rule 0.8s 0.2s both;
+}
+.detail-info .credit-group {
+  animation: line-rise 0.7s 0.25s both;
+}
+.detail-info .credit-group:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.detail-info .credit-group:nth-child(3) {
+  animation-delay: 0.35s;
+}
+.detail-metadata div {
+  position: relative;
+  border-top-color: transparent;
+}
+.detail-metadata div:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+  animation: rule-grow 0.75s 0.35s both;
+}
+.detail-metadata div:nth-child(2):before {
+  animation-delay: 0.4s;
+}
+.detail-metadata div:nth-child(3):before {
+  animation-delay: 0.45s;
+}
+.detail-metadata div:nth-child(4):before {
+  animation-delay: 0.5s;
+}
+.detail-metadata div > span {
+  animation: line-rise 0.7s 0.45s both;
+}
+.detail-info .corner {
+  animation: cross-pop 0.8s 0.55s both;
+}
+.detail-info .corner:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.detail-info .corner:nth-child(3) {
+  animation-delay: 0.65s;
+}
+.detail-info .corner:nth-child(4) {
+  animation-delay: 0.7s;
+}
+.detail-info .rule-link span {
+  animation: line-rise 0.7s 0.65s both;
+}
+@keyframes rule-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes cross-pop {
+  0% {
+    transform: scale(0) rotate(-90deg);
+    opacity: 0;
+  }
+  75% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes detail-rule {
+  from {
+    clip-path: inset(0 50%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-line-rise,
+  .detail-info .credits,
+  .detail-info .credit-group,
+  .detail-metadata div:before,
+  .detail-metadata div > span,
+  .detail-info .corner,
+  .detail-info .rule-link span {
+    animation: none;
+  }
+}
+
+/* Copy follows the disc reveal; reverse navigation uses the same stage. */
+#load-year {
+  display: inline-flex;
+  height: 1em;
+  vertical-align: bottom;
+}
+.load-right .load-cell {
+  min-width: 0.6em;
+}
+.gallery-entering #film-info,
+.gallery-entering #reviews {
+  animation: gallery-copy 0.7s 0.3s var(--ease) both;
+}
+.loading.gallery-entering #film-info,
+.loading #gallery.gallery-entering #film-info,
+.loading #gallery.gallery-entering #reviews {
+  animation-play-state: paused;
+}
+.gallery-exiting #film-info,
+.gallery-exiting #reviews {
+  animation: none;
+  opacity: 0;
+  translate: 0 -12px;
+  transform: none;
+}
+@keyframes gallery-copy {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-entering #film-info,
+  .gallery-entering #reviews {
+    animation: none;
+  }
+  .load-strip {
+    animation: none;
+  }
+  .load-count {
+    transition: none;
+  }
+}
+
+/* Club content uses the restored paper, type and generous spacing. */
+.logo {
+  width: auto;
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+}
+.poster-section {
+  text-align: center;
+  padding: 4rem 6vw 2rem;
+}
+.full-poster {
+  display: block;
+  width: min(100%, 600px);
+  height: auto;
+  margin: auto;
+}
+.poster-section p {
+  margin-top: 1rem;
+}
+.poster-section a:focus-visible {
+  outline: 2px solid #4e8bc2;
+}
+.template-label {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  margin-bottom: 2rem;
+}
+.missing-page {
+  padding: 25vh 8vw;
+}
+.missing-page h1 {
+  margin-bottom: 2rem;
+}
+.description-copy {
+  overflow-wrap: anywhere;
+}
+.synopsis-credit a,
+.poster-section p a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
