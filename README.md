@@ -6,12 +6,12 @@
 
 ## 本地运行
 
-Node.js 22+（验证环境 24）。项目没有运行时依赖：
+Node.js 22+（验证环境 24）。站点本身没有运行时依赖，`npm start` 可直接运行；测试、格式化与海报生成需要先安装开发依赖：
 
 ```sh
 npm start          # http://localhost:4173
+npm ci
 npm test           # Node 单元测试
-npm ci             # 仅浏览器测试 / 格式化 / 海报生成需要的开发依赖
 npm run format:check
 ```
 
@@ -24,7 +24,7 @@ npm run build                         # 域名根目录 /
 BASE_PATH=/Cinema/ npm run build      # GitHub 项目路径 /Cinema/
 ```
 
-`dist/` 是唯一发布目录，首页与每个详情页都有真实的 `index.html`，可直接打开或刷新，无需 SPA 重写；`404.html` 提供返回首页的入口。推送到 `main` 后，`.github/workflows/pages.yml` 运行单元测试、按 `/Cinema/` 构建并部署到 GitHub Pages。
+`dist/` 是唯一发布目录，首页与每个详情页都有真实的 `index.html`，可直接打开或刷新，无需 SPA 重写；`404.html` 提供返回首页的入口。推送到 `main` 后，`.github/workflows/pages.yml` 安装依赖、运行单元测试、按 `/Cinema/` 构建并部署到 GitHub Pages：https://tdwhere123.github.io/Cinema/
 
 发布素材的权利说明见 NOTICE.md。
 
