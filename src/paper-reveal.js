@@ -343,7 +343,8 @@ export function mountPaperReveal(section, { reduced = false } = {}) {
     const footW = (box.max.x - box.min.x) * 0.94,
       footH = (box.max.y - box.min.y) * 0.94;
     shadow.style.cssText = `width:${footW}px;height:${footH}px;transform:translate(-50%,-50%) translate(${lift * 0.4}px,${lift * 0.7}px);filter:blur(${5 + lift * 0.35}px);opacity:${0.34 - Math.min(0.14, lift / 300)}`;
-    s.renderer.render(s.scene, s.camera);
+    if (!s.renderer.getContext().isContextLost())
+      s.renderer.render(s.scene, s.camera);
   }
   function tick(now) {
     frame = 0;

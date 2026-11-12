@@ -962,7 +962,10 @@ export function createDiscScene(
         disc.classList.toggle('active', active);
       }
     });
-    if (renderer) renderer.render(scene, camera);
+    // Between a lost context and its event, a first draw would compile shaders against a dead
+    // context, and Three.js throws reading their (null) info log.
+    if (renderer && !renderer.getContext().isContextLost())
+      renderer.render(scene, camera);
   }
   queueMicrotask(() => {
     if (!destroyed)

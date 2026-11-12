@@ -404,7 +404,7 @@ export function createNextDisc(section, image) {
     spin.rotation.z = rotation;
     chargeArc.visible = charge > 0.002;
     if (chargeArc.visible) updateInkRibbon(chargeArc.geometry, charge, slot);
-    renderer.render(scene, camera);
+    if (!renderer.getContext().isContextLost()) renderer.render(scene, camera);
   }
   return {
     paint,
