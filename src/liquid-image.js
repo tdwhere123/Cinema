@@ -1,8 +1,9 @@
 /**
- * Liquid ink reveal for film stills. Each image is drawn by its own WebGL2 canvas inside its
- * frame (so it scrolls with the page), masked by a domain-warped noise front that follows the
- * scroll position: the image soaks downward into the paper as it enters, its upper edge
- * dissolves as it leaves, and the pointer refracts it like a lens of water.
+ * Watercolour reveal for film stills. Each image is drawn by its own WebGL2 canvas inside its
+ * frame (so it scrolls with the page). A slow domain-warped front follows the scroll position;
+ * around it a feathered band, broken up by fixed paper-fibre noise, lets the image soak in
+ * pale and desaturated before its colour arrives, with only a faint pigment pool at the edge.
+ * The upper edge dissolves the same way as it leaves; the pointer is a lens of water.
  * The DOM <img> stays the accessible source and is shown again whenever the canvas is idle.
  */
 import { clamp } from './math.js';
@@ -20,9 +21,9 @@ uniform float uFront;    // px from the top that the ink front has reached
 uniform float uExit;     // px from the top already dissolved away on exit
 uniform float uRise;     // px from the top above which a rising front still hides the image
 uniform float uAmp;      // front irregularity in px
+uniform float uFeather;  // width of the soaking band in px
 uniform float uTime, uSeed, uWobble;
 uniform vec3 uMouse;     // xy in px from top-left, z strength
-uniform vec3 uPaper;
 
 float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float noise(vec2 p){
@@ -31,54 +32,51 @@ float noise(vec2 p){
 }
 float fbm(vec2 p){
   float v = 0.0, a = 0.5;
-  for (int i = 0; i < 3; i++) { v += a * noise(p); p = p * 2.07 + 17.1; a *= 0.45; }
+  for (int i = 0; i < 4; i++) { v += a * noise(p); p = p * 2.03 + 17.1; a *= 0.5; }
   return v;
 }
-// Signed distance-like field in px: > 0 means ink (image) is present.
+// Large-scale front in px (> 0: the image has soaked in). Slow domain warp, gentle lobes.
 float field(vec2 px){
-  vec2 p = px / 520.0 + uSeed;
-  float t = uTime * 0.05;
+  vec2 p = px / 640.0 + uSeed;
+  float t = uTime * 0.035;
   vec2 q = vec2(fbm(p + vec2(0.0, t)), fbm(p + vec2(5.2, -t)));
-  float n = (fbm(p + 2.4 * q + vec2(t * 0.6, 0.0)) - 0.45) * 1.6;
-  // Rounded drips: narrow lobes that hang off the front like liquid about to fall.
-  float lane = fbm(vec2(px.x / 150.0 + uSeed, t * 0.25));
-  float drip = pow(smoothstep(0.42, 0.8, lane), 2.0);
-  float centre = cos((px.x / uSize.x - 0.5) * 3.14159);
+  float n = (fbm(p + 1.8 * q) - 0.5) * 1.5;
+  float lobe = smoothstep(0.45, 0.85, fbm(vec2(px.x / 210.0 + uSeed, t * 0.3)));
   float amp = uAmp * (1.0 + uWobble);
-  float enter = uFront - px.y + n * amp + drip * amp * 0.7 + centre * uAmp * 0.2;
-  float rise = px.y - uRise + n * amp + drip * amp * 0.5 - centre * uAmp * 0.15;
-  vec2 pe = px / 420.0 - uSeed;
-  float exitEdge = px.y - uExit + (fbm(pe + vec2(t, 3.1)) - 0.45) * uAmp * 1.2;
-  float f = min(min(enter, rise), uExit > -uAmp ? exitEdge : 1e4);
+  float enter = uFront - px.y + n * amp + lobe * amp * 0.35;
+  float rise = px.y - uRise + n * amp + lobe * amp * 0.25;
+  float exitEdge = px.y - uExit + (fbm(px / 520.0 - uSeed + vec2(t, 3.1)) - 0.5) * uAmp * 1.2;
+  float f = min(min(enter, rise), uExit > -uAmp - uFeather ? exitEdge : 1e4);
   vec2 d = px - uMouse.xy;
-  f += uMouse.z * 70.0 * exp(-dot(d, d) / 14000.0);
-  return f;
+  return f + uMouse.z * 60.0 * exp(-dot(d, d) / 16000.0);
 }
 void main(){
   vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uSize;
   float f = field(px);
-  float aa = max(fwidth(f), 0.75);
-  float e = 2.5;
-  vec2 g = vec2(field(px + vec2(e, 0.0)) - f, field(px + vec2(0.0, e)) - f) / e;
-  vec2 n = g / max(length(g), 1e-4);
-  float inside = smoothstep(-aa, aa, f);
-  float meniscus = 1.0 - smoothstep(0.0, 34.0, f);
-  // Water lens around the pointer and along the meniscus.
+  // Paper grain fixed in place: pigment creeps along the fibres instead of a clean cut.
+  float fibre = fbm(px / 64.0 + uSeed * 3.0) - 0.5;
+  float grain = noise(px / 11.0 + uSeed * 5.0) - 0.5;
+  float fe = f + fibre * uFeather * 0.7 + grain * uFeather * 0.07;
+  // A slight wet drift near the edge and a lens of water under the pointer.
   vec2 d = px - uMouse.xy;
   float lens = uMouse.z * exp(-dot(d, d) / 9000.0);
-  vec2 offset = -n * meniscus * meniscus * 12.0 + d * lens * 0.12;
-  vec2 uv = clamp((px + offset) / uSize, 0.0, 1.0);
-  vec3 col = texture(uImage, vec2(uv.x, uv.y)).rgb;
-  col *= 1.0 - 0.32 * meniscus * meniscus;
-  col = mix(col, col * col * 1.25, 0.35 * meniscus);
-  float rim = smoothstep(0.0, 2.0, f) * (1.0 - smoothstep(2.0, 5.5, f));
-  col += rim * max(dot(n, normalize(vec2(-0.5, -0.85))), 0.0) * 0.38;
-  // A wet shadow bleeds a little way into the paper ahead of the front.
-  float halo = (1.0 - smoothstep(0.0, 22.0, -f)) * (1.0 - inside) * 0.16;
-  vec3 wet = uPaper * 0.72;
-  float alpha = inside + halo;
-  vec3 rgb = (col * inside + wet * halo) / max(alpha, 1e-4);
-  outColor = vec4(rgb * alpha, alpha);
+  float wetness = 1.0 - smoothstep(-uFeather * 0.5, uFeather * 0.5, fe);
+  vec2 drift = vec2(fibre, grain) * wetness * 10.0 + d * lens * 0.1;
+  vec3 col = texture(uImage, clamp((px + drift) / uSize, 0.0, 1.0)).rgb;
+  float lum = dot(col, vec3(0.299, 0.587, 0.114));
+  // Like pigment (or a print in the developer), dark tones soak in first, highlights last,
+  // so the edge spreads as ink instead of fading through grey mist.
+  fe += (0.5 - lum) * uFeather * 0.9;
+  float ink = smoothstep(-uFeather * 0.5, uFeather * 0.5, fe);
+  ink = ink * ink * (3.0 - 2.0 * ink);
+  // Watercolour bloom: pigment pools faintly where the wash is drying, never a hard rim.
+  float pool = smoothstep(0.2, 0.6, ink) * (1.0 - smoothstep(0.6, 0.95, ink));
+  // Colour arrives last: the thin wash at the edge is desaturated, full once soaked.
+  // (Transparency alone lets the paper show through; no paper tint, which reads as froth.)
+  col = mix(vec3(lum), col, 0.35 + 0.65 * smoothstep(0.2, 1.0, ink));
+  col *= 1.0 - 0.07 * pool;
+  float alpha = ink;
+  outColor = vec4(col * alpha, alpha);
 }`;
 
 function compile(gl, type, source) {
@@ -134,11 +132,11 @@ function createSurface(frame, image) {
       'uExit',
       'uRise',
       'uAmp',
+      'uFeather',
       'uTime',
       'uSeed',
       'uWobble',
       'uMouse',
-      'uPaper',
     ].map((n) => [n, gl.getUniformLocation(program, n)]),
   );
   frame.append(canvas);
@@ -160,11 +158,11 @@ function createSurface(frame, image) {
       gl.uniform1f(uniforms.uExit, state.exit);
       gl.uniform1f(uniforms.uRise, state.rise);
       gl.uniform1f(uniforms.uAmp, state.amp);
+      gl.uniform1f(uniforms.uFeather, state.feather);
       gl.uniform1f(uniforms.uTime, state.time);
       gl.uniform1f(uniforms.uSeed, state.seed);
       gl.uniform1f(uniforms.uWobble, state.wobble);
       gl.uniform3f(uniforms.uMouse, state.mx, state.my, state.mz);
-      gl.uniform3f(uniforms.uPaper, 0.953, 0.945, 0.922);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     },
     dispose() {
@@ -270,12 +268,15 @@ export function mountLiquidImages(root, { reduced = false } = {}) {
         if (item.surface) release(item);
         continue;
       }
-      const amp = vh * (innerWidth < 768 ? 0.16 : 0.22);
+      const amp = vh * (innerWidth < 768 ? 0.1 : 0.13),
+        feather = innerWidth < 768 ? 70 : 110;
       item.origin ??= r.top + scrollY;
       const targetFront = item.rising
-        ? r.height + amp * 3
+        ? r.height + amp * 3 + feather
         : frontFor(r, vh, { lead: item.lead });
-      const targetRise = item.rising ? riseFor(r, vh, item.origin, amp) : -1e5;
+      const targetRise = item.rising
+        ? riseFor(r, vh, item.origin, amp + feather)
+        : -1e5;
       const targetExit = -r.top - vh * 0.06;
       // Liquid lag: the front eases toward the scroll target instead of snapping to it.
       const k = Math.min(1, dt * 5.5);
@@ -293,8 +294,9 @@ export function mountLiquidImages(root, { reduced = false } = {}) {
           : item.rise + (targetRise - item.rise) * k;
       item.mouse.z += (item.mouse.target - item.mouse.z) * Math.min(1, dt * 7);
       const soaked =
-        item.front > r.height + amp * 1.2 && item.rise < -amp * 1.6;
-      const intact = item.exit < -amp * 1.2;
+        item.front > r.height + amp * 1.2 + feather &&
+        item.rise < -(amp * 1.6 + feather);
+      const intact = item.exit < -(amp * 1.2 + feather);
       if (soaked) complete(item.img);
       else item.img.dataset.reveal = 'dissolving';
       const settled =
@@ -329,6 +331,7 @@ export function mountLiquidImages(root, { reduced = false } = {}) {
         exit: item.exit,
         rise: item.rise,
         amp,
+        feather,
         time: (now - birth) / 1000,
         seed: item.seed,
         wobble: velocity * 0.6,
