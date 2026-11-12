@@ -2,6 +2,13 @@
 @font-face {
   font-family: Eiko;
   src: url('../assets/fonts/cinema-serif.woff2') format('woff2');
+  unicode-range: U+0000-63FF;
+  font-display: swap;
+}
+@font-face {
+  font-family: Eiko;
+  src: url('../assets/fonts/cinema-serif-2.woff2') format('woff2');
+  unicode-range: U+6400-10FFFF;
   font-display: swap;
 }
 @font-face {

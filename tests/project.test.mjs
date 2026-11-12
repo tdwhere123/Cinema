@@ -28,6 +28,23 @@ test('unannounced selections are a blank disc with no title or page', async () =
     await access(new URL(u.art));
   }
 });
+test('story and background are multi-paragraph and every background source is linked', () => {
+  const esc = (v) => String(v);
+  for (const f of catalogue) {
+    assert.ok(f.story.length >= 2, f.id);
+    assert.ok(Array.isArray(f.context) && f.context.length >= 3, f.id);
+    assert.ok(f.contextSources.length >= 2, f.id);
+    const html = clubChapters(f, esc);
+    for (const s of f.contextSources) {
+      assert.equal(new URL(s.url).protocol, 'https:');
+      assert.ok(html.includes(s.url), s.url);
+    }
+    assert.equal(
+      (html.match(/class="story-more/g) || []).length,
+      f.story.length,
+    );
+  }
+});
 test('interviews are cited and render as one chapter before the poster', () => {
   const esc = (v) => String(v);
   for (const f of catalogue) {

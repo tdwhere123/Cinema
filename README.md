@@ -52,4 +52,4 @@ npm run test:static  # 需要 python3；构建并在无 SPA 回退的静态服�
 
 ## 字体
 
-全部为本地 WOFF2 子集，分三种角色：马善政（标题、章节名与引语）、霞鹜文楷（正文与访谈回答）、Noto Sans SC（标签、提问与小字）；Rock Salt 只用于 CINEMA 字标，Caveat 只用于加载计数，Noto Serif SC 作回退。正文字体按 U+6400 分为两个文件，以 `unicode-range` 配对。许可与来源见 `assets/fonts/README.md`。修改文案后运行联网维护命令 `node scripts/fonts.mjs` 重新生成子集；未包含的字符使用系统中文字体回退。剧照来源和权利说明见 `assets/film-stills-sources.json`。
+全部为本地 WOFF2 子集，分三种角色：马善政（标题、章节名与引语）、霞鹜文楷（正文与访谈回答）、Noto Sans SC（标签、提问与小字）；Rock Salt 只用于 CINEMA 字标，Caveat 只用于加载计数，Noto Serif SC 作回退。正文与回退字体（楷体、黑体、宋体）按 U+6400 各分为两个文件，以 `unicode-range` 配对。许可与来源见 `assets/fonts/README.md`。修改文案后运行联网维护命令 `node scripts/fonts.mjs` 重新生成子集；未包含的字符使用系统中文字体回退。剧照来源和权利说明见 `assets/film-stills-sources.json`。

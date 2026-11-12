@@ -1081,6 +1081,8 @@ body {
 #detail.club {
   --read: clamp(16px, 1.12vw, 18px);
   --lead: clamp(20px, 1.6vw, 25px);
+  /* Interview answers are read at length: one step up from body. */
+  --talk: clamp(18px, 1.38vw, 21px);
 }
 #detail.club .story-copy {
   margin: 0;
@@ -1089,6 +1091,18 @@ body {
   line-height: 1.9;
   letter-spacing: 0.03em;
   text-wrap: pretty;
+}
+#detail.club .story-more {
+  margin: 1.8em 0 0;
+  max-width: 34em;
+  font-family: var(--font-kai);
+  font-size: var(--read);
+  line-height: 2.05;
+  letter-spacing: 0.03em;
+  text-wrap: pretty;
+}
+#detail.club .reading-body > p:not(.fine-print) {
+  margin: 0 0 1.5em;
 }
 #detail.club .fine-print {
   margin-top: 3em;
@@ -1195,14 +1209,14 @@ body {
 /* Interview: questions in the quiet sans, answers in the reading face, one pull quote. */
 #detail.club .interview-body {
   grid-column: 2 / 4;
-  max-width: 40em;
+  max-width: 44em;
 }
 #detail.club .interview-lede {
   margin: 0 0 5em;
   padding-left: 1.4em;
   border-left: 1px solid var(--rule);
   font-family: var(--font-kai);
-  font-size: var(--read);
+  font-size: clamp(17px, 1.25vw, 19px);
   line-height: 2;
   letter-spacing: 0.03em;
   color: var(--muted);
@@ -1221,7 +1235,7 @@ body {
   left: 0;
   top: 0.55em;
   font-family: var(--font-note);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: var(--muted);
 }
@@ -1236,7 +1250,7 @@ body {
 #detail.club .qa-q p {
   margin: 0 0 0.5em;
   font-family: var(--font-note);
-  font-size: 14px;
+  font-size: clamp(15px, 1.1vw, 17px);
   line-height: 1.95;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -1246,7 +1260,10 @@ body {
   margin-bottom: 1.4em;
 }
 #detail.club .qa-a p {
-  margin: 0 0 1.1em;
+  margin: 0 0 1.2em;
+  font-size: var(--talk);
+  line-height: 2;
+  max-width: 32em;
 }
 #detail.club .pull-quote {
   margin: 6em 0 6.4em;

@@ -51,6 +51,7 @@ test('local Chinese font assets are bounded genuine WOFF2 with both upstream not
   // Reading faces ship as two subsets each (split at U+6400), every file a bounded WOFF2.
   for (const name of [
     'cinema-serif',
+    'cinema-serif-2',
     'cinema-sans',
     'cinema-sans-2',
     'cinema-kai',
@@ -64,7 +65,7 @@ test('local Chinese font assets are bounded genuine WOFF2 with both upstream not
   const css =
     (await readFile('src/style.css', 'utf8')) +
     (await readFile('src/editorial.css', 'utf8'));
-  for (const name of ['cinema-sans-2', 'cinema-kai-2'])
+  for (const name of ['cinema-serif-2', 'cinema-sans-2', 'cinema-kai-2'])
     assert.match(css, new RegExp(`${name}\\.woff2[^}]*U\\+6400-10FFFF`));
   assert.match(
     await readFile('assets/fonts/Sans-OFL.txt', 'utf8'),

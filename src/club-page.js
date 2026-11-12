@@ -28,8 +28,21 @@ export function clubChapters(f, esc) {
   let n = 0;
   const head = (name) =>
     `<header class="chapter-head"><span class="chapter-num">${NUMERALS[n++]}</span><span class="chapter-name">${name}</span></header>`;
-  const story = `<section class="chapter chapter-story description-section" data-chapter="故事">${head('故事')}<div class="chapter-body"><p class="story-copy description-copy settle">${esc(f.summary)}</p><p class="fine-print synopsis-credit">独立撰写的影片简介 · ${source}</p></div><aside class="chapter-aside honors awards"><h3 class="aside-title">荣誉</h3><ol>${f.awards.map((a) => `<li class="award-item settle"><span class="award-label">${esc(a.award)}</span><span class="award-event">${esc(a.event)}</span></li>`).join('')}</ol></aside></section>`;
-  const context = `<section class="chapter chapter-context reading-section" data-chapter="背景">${head('背景')}<div class="chapter-body reading-body"><h2 data-ink>${esc(f.contextTitle)}</h2><p class="settle">${esc(f.context)}</p><p class="fine-print reading-source">事实资料 · ${f.id === 'poetry' ? 'Festival de Cannes' : 'Netflix Tudum'} · ${source}</p></div></section>`;
+  const story = `<section class="chapter chapter-story description-section" data-chapter="故事">${head('故事')}<div class="chapter-body"><p class="story-copy description-copy settle">${esc(f.summary)}</p>${(f.story || []).map((p) => `<p class="story-more settle">${esc(p)}</p>`).join('')}<p class="fine-print synopsis-credit">独立撰写的影片简介 · ${source}</p></div><aside class="chapter-aside honors awards"><h3 class="aside-title">荣誉</h3><ol>${f.awards.map((a) => `<li class="award-item settle"><span class="award-label">${esc(a.award)}</span><span class="award-event">${esc(a.event)}</span></li>`).join('')}</ol></aside></section>`;
+  const sources = (f.contextSources || [])
+    .map(
+      (s) =>
+        `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)} ↗</a>`,
+    )
+    .join(' · ');
+  const context = `<section class="chapter chapter-context reading-section" data-chapter="背景">${head('背景')}<div class="chapter-body reading-body"><h2 data-ink>${esc(f.contextTitle)}</h2>${[
+    f.context,
+  ]
+    .flat()
+    .map((p) => `<p class="settle">${esc(p)}</p>`)
+    .join(
+      '',
+    )}<p class="fine-print reading-source">资料来源 · ${sources || source}</p></div></section>`;
   const interview = f.interview
     ? `<section class="chapter chapter-interview" data-chapter="访谈">${head('访谈')}${interviewChapter(f, esc)}</section>`
     : '';

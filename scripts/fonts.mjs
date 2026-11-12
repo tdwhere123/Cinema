@@ -67,6 +67,7 @@ const fonts = [
     'OFL.txt',
     'OFL.txt',
     interfaceCharacters,
+    true,
   ],
   [
     'Noto Sans SC',
