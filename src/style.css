@@ -7,6 +7,13 @@
 @font-face {
   font-family: Montreal;
   src: url('../assets/fonts/cinema-sans.woff2') format('woff2');
+  unicode-range: U+0000-63FF;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montreal;
+  src: url('../assets/fonts/cinema-sans-2.woff2') format('woff2');
+  unicode-range: U+6400-10FFFF;
   font-display: swap;
 }
 :root {

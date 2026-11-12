@@ -2,14 +2,14 @@ import { mountLiquidImages } from './liquid-image.js';
 import {
   clubChapters,
   mountChapterRail,
-  mountMarkers,
-  mountTextReveal,
+  mountInkBleed,
+  mountSettle,
 } from './club-page.js';
 import { mountTopicMenu } from './topic-menu.js';
 import { mountPaperReveal } from './paper-reveal.js';
 import { localPath, siteURL } from './routes.js';
 /** 应用层：路由、页面与交互。原站使用的打包脚本没有复制到本项目。 */
-import { catalogue } from './data.js';
+import { catalogue, upcoming } from './data.js';
 import { createDiscScene } from './scene.js';
 import { clamp } from './math.js';
 import { mountEntrance } from './entrance.js';
@@ -21,8 +21,13 @@ import { mountHeroDissolve } from './hero-dissolve.js';
 import { mountNextProduction } from './next-production.js';
 const $ = (s) => document.querySelector(s);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// The gallery shows announced films in release order, then the blank discs still to come.
+const galleryItems = (name) => [
+  ...catalogue.filter((f) => f.category === name),
+  ...(name === 'films' ? upcoming : []),
+];
 let category = 'films',
-  items = catalogue.filter((x) => x.category === category),
+  items = galleryItems(category),
   index = 0,
   scene = null;
 let busy = false,
@@ -86,9 +91,12 @@ function updateInfo() {
   const f = current();
   if (!f) return;
   const info = $('#film-info');
-  const isClub = f.category === 'films';
+  const isClub = f.tba || f.category === 'films';
   info.classList.remove('fresh');
-  info.innerHTML = `<h2>${esc(f.title)}</h2><dl><div><dt>${isClub ? '导演' : 'DIRECTED BY'}</dt><dd>${f.directors.map(esc).join('<br>')}</dd></div><div><dt>${isClub ? '年份' : 'YEAR'}</dt><dd>${esc(f.year)}</dd></div><div><dt>${isClub ? '主演' : 'STARRING'}</dt><dd>${f.cast.slice(0, 5).map(esc).join('<br>')}</dd></div></dl>`;
+  info.classList.toggle('tba', !!f.tba);
+  info.innerHTML = f.tba
+    ? `<h2>？</h2><dl><div><dt>片名</dt><dd>待揭晓</dd></div></dl>`
+    : `<h2>${esc(f.title)}</h2><dl><div><dt>${isClub ? '导演' : 'DIRECTED BY'}</dt><dd>${f.directors.map(esc).join('<br>')}</dd></div><div><dt>${isClub ? '年份' : 'YEAR'}</dt><dd>${esc(f.year)}</dd></div><div><dt>${isClub ? '主演' : 'STARRING'}</dt><dd>${f.cast.slice(0, 5).map(esc).join('<br>')}</dd></div></dl>`;
   info.querySelectorAll('h2,dt,dd').forEach((el, i) => {
     el.style.setProperty('--line-delay', `${i * 0.035}s`);
     el.innerHTML = el.innerHTML
@@ -101,7 +109,7 @@ function updateInfo() {
   });
   void info.offsetWidth;
   info.classList.add('fresh');
-  $('#reviews').innerHTML = f.reviews
+  $('#reviews').innerHTML = (f.reviews || [])
     .map(
       (r) =>
         `<article class="review"><div class="review-stars" aria-label="${esc(r.stars)} out of 5">${Array.from({ length: 5 }, (_, i) => `<span class="rating-star" style="--fill:${clamp(Number(r.stars) - i, 0, 1) * 100}%" aria-hidden="true"></span>`).join('')}</div><p class="eyebrow">${esc(r.publication)}</p><h3>${esc(r.text)}</h3></article>`,
@@ -110,7 +118,12 @@ function updateInfo() {
   $('#counter').textContent = `${index + 1} / ${items.length}`;
   $('#prev').disabled = index === 0;
   $('#next').disabled = index === items.length - 1;
-  $('#open-current').setAttribute('aria-label', `Open ${f.title}`);
+  $('#open-current').disabled = !!f.tba;
+  $('#open-current').textContent = f.tba ? '尚未揭晓' : '影片介绍 ↗';
+  $('#open-current').setAttribute(
+    'aria-label',
+    f.tba ? '这一部尚未揭晓' : `打开《${f.title}》`,
+  );
   document
     .querySelectorAll('#index-list button')
     .forEach((b, i) => b.classList.toggle('active', i === index));
@@ -127,14 +140,16 @@ function setCategory(next) {
   category = next;
   $('#gallery h1').textContent =
     next === 'films' ? '观影会 · 李沧东' : '参考模板 · 非活动选片';
-  items = catalogue.filter((f) => f.category === next);
+  items = galleryItems(next);
   index = remembered[next] || 0;
   scene = createDiscScene($('#scene'), items, {
     onSelect: (i) => {
       index = i;
       updateInfo();
     },
-    onOpen: () => navigate(`/production/${current().id}`),
+    onOpen: () => {
+      if (!current().tba) navigate(`/production/${current().id}`);
+    },
     onRendererChange: () => {
       $('#renderer-status').textContent =
         'WebGL 上下文已丢失，已切换 CSS 兼容路径。';
@@ -150,9 +165,10 @@ function setCategory(next) {
     },
   });
   $('#index-list').innerHTML = items
-    .map(
-      (f, i) =>
-        `<button data-index="${i}"><span>${esc(f.title)}</span><small>${esc(f.year)}</small></button>`,
+    .map((f, i) =>
+      f.tba
+        ? `<button data-index="${i}" class="tba"><span>？</span><small>待揭晓</small></button>`
+        : `<button data-index="${i}"><span>${esc(f.title)}</span><small>${esc(f.year)}</small></button>`,
     )
     .join('');
   scene.setIndex(index, true);
@@ -169,12 +185,15 @@ $('#index-list').onclick = (e) => {
   if (!b) return;
   choose(Number(b.dataset.index));
   toggleIndex(false);
-  if (!$('#detail').hidden) navigate(`/production/${current().id}`);
+  if (current().tba) navigate('/');
+  else if (!$('#detail').hidden) navigate(`/production/${current().id}`);
   else $('#scene').focus();
 };
 $('#prev').onclick = () => choose(index - 1);
 $('#next').onclick = () => choose(index + 1);
-$('#open-current').onclick = () => navigate(`/production/${current().id}`);
+$('#open-current').onclick = () => {
+  if (!current().tba) navigate(`/production/${current().id}`);
+};
 addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !$('#index-panel').hidden) {
     toggleIndex(false);
@@ -185,11 +204,20 @@ addEventListener('keydown', (e) => {
 function openTrailer(f) {
   trailerPlayer.open(f);
 }
+const detailFooter = `<footer class="detail-footer">CINEMA 观影会 · 影像与生活</footer>`;
+function nextFilm(next, parts, isClub) {
+  const sub = parts.length === 1 ? ` data-sub="${esc(next.year)}"` : '';
+  return `<section class="next-section"${isClub ? ' data-chapter="下一部"' : ''}><div class="next-meta"><p class="next-kicker">${isClub ? '下一部' : 'NEXT PRODUCTION'}</p><div class="next-progress" role="progressbar" aria-label="继续向下滚动，前往下一部" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><p class="next-hint">${isClub ? '继续向下滚动' : 'KEEP SCROLLING TO CONTINUE'}</p></div><a href="${siteURL(`/production/${next.id}`)}" class="next-target"><h2 class="reveal" aria-label="${esc(next.title)}"${sub}>${parts.map((part, i) => `<span class="next-line-mask" data-line="${i}"><span class="next-line">${esc(part)}${i === 0 && next.title.includes(' ') && parts.length > 1 ? ' ' : ''}</span></span>`).join('')}</h2></a><img class="next-disc" src="${next.art}" alt="${esc(next.title)} 碟片">${detailFooter}</section>`;
+}
+/** After the last announced film: the blank disc, without a way forward yet. */
+function quietEnding(next) {
+  return `<section class="next-section next-tba" data-chapter="下一部"><div class="next-meta"><p class="next-kicker">下一部</p><p class="next-hint">尚未揭晓</p></div><div class="next-target"><h2 class="reveal" aria-label="下一部尚未揭晓" data-sub="待揭晓"><span class="next-line-mask" data-line="0"><span class="next-line">？</span></span></h2></div><img class="next-disc" src="${next.art}" alt="尚未揭晓的碟片">${detailFooter}</section>`;
+}
 function renderDetail(f) {
   const next = items[(index + 1) % items.length];
   const isClub = f.category === 'films';
   const joiner = isClub ? '、' : ', ';
-  const nextParts = nextTitleParts(next.title);
+  const nextParts = next.tba ? ['？'] : nextTitleParts(next.title);
   $('#detail').innerHTML = `
  <header class="detail-info"${isClub ? ' data-chapter="片名"' : ''}><h1 class="detail-title" tabindex="-1">${titleLines(
    f.title,
@@ -214,18 +242,18 @@ function renderDetail(f) {
    )
    .join(
      '',
-   )}</div><div class="detail-cta"><span class="corner tl">+</span><span class="corner tr">+</span><span class="corner bl">+</span><span class="corner br">+</span>${f.actions.map((a) => `<a class="rule-link" href="${esc(a.url)}" target="_blank" rel="noopener"><span>${esc(a.label)}</span></a>`).join('')}</div></header>
+   )}</div>${isClub ? '' : `<div class="detail-cta"><span class="corner tl">+</span><span class="corner tr">+</span><span class="corner bl">+</span><span class="corner br">+</span>${f.actions.map((a) => `<a class="rule-link" href="${esc(a.url)}" target="_blank" rel="noopener"><span>${esc(a.label)}</span></a>`).join('')}</div>`}</header>
  ${isClub ? clubChapters(f, esc) : ''}
  ${f.trailer ? `<section class="trailer-section"><div class="trailer-sticky"><img class="trailer-picture" src="${f.still}" alt="${esc(f.title)} 预告静帧"><div class="trailer-copy"><h2 class="reveal">${esc(f.tagline)}</h2><button class="rule-link" id="watch-trailer"><span>WATCH TRAILER</span></button></div></div></section>` : ''}
  ${isClub ? '' : `<section class="description-section"><div class="description-lead"><span class="section-kicker reveal">${isClub ? 'SYNOPSIS / 故事梗概' : 'SYNOPSIS'}</span><p class="description-copy reveal">${esc(f.summary)}</p><p class="synopsis-credit">独立撰写的影片简介 · <a href="${esc(f.source)}" target="_blank" rel="noopener">资料来源 ↗</a></p></div><div class="awards reveal">${f.awards.map((a) => `<div class="award-item"><span class="award-label">${esc(a.award)}</span><span class="award-event">${esc(a.event)}</span></div>`).join('')}${f.moreAwards ? `<span class="award-label">${esc(f.moreAwards)}</span>` : ''}</div>${f.vector ? `<div class="description-vector"><img src="${f.vector}" alt="" loading="lazy"></div>` : ''}</section>`}
- <section class="next-section"${isClub ? ' data-chapter="下一部"' : ''}><div class="next-rules" aria-hidden="true"><span class="next-rule"></span><span class="next-rule"></span><span class="next-rule"></span><span class="next-rule"></span><span class="next-rule"></span></div><div class="next-meta"><p class="next-kicker">${isClub ? 'NEXT FILM · 下一部选片' : 'NEXT PRODUCTION'}</p><div class="next-progress" role="progressbar" aria-label="Continue scrolling to next production" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><p class="next-hint">${isClub ? '继续向下滚动 · KEEP SCROLLING' : 'KEEP SCROLLING TO CONTINUE'}</p></div><a href="${siteURL(`/production/${next.id}`)}" class="next-target"><h2 class="reveal" aria-label="${esc(next.title)}" ${nextParts.length === 1 ? `data-sub="${esc(next.id.replace(/-/g, ' ').toUpperCase())} · ${esc(next.year)}"` : ''}>${nextParts.map((part, i) => `<span class="next-line-mask" data-line="${i}"><span class="next-line">${esc(part)}${i === 0 && next.title.includes(' ') && nextParts.length > 1 ? ' ' : ''}</span></span>`).join('')}</h2></a><img class="next-disc" src="${next.art}" alt="${esc(next.title)} disc artwork"><footer class="detail-footer">CINEMA 观影会 · 影像与生活</footer></section>`;
+ ${next.tba ? quietEnding(next) : nextFilm(next, nextParts, isClub)}`;
   cleanupStills();
   cleanupStills = mountLiquidImages($('#detail'), { reduced: reduce });
   cleanupClub();
   $('#detail').classList.toggle('club', isClub);
   if (isClub) {
-    const parts = [mountChapterRail, mountMarkers, mountTextReveal].map(
-      (mount) => mount($('#detail'), { reduced: reduce }),
+    const parts = [mountChapterRail, mountSettle, mountInkBleed].map((mount) =>
+      mount($('#detail'), { reduced: reduce }),
     );
     cleanupClub = () => parts.forEach((stop) => stop());
   } else cleanupClub = () => {};
@@ -238,7 +266,7 @@ function renderDetail(f) {
     cleanupHero = mountHeroDissolve($('.detail-info'), { reduced: reduce });
   cleanupNext();
   cleanupNext = mountNextProduction($('.next-section'), {
-    onAdvance: () => navigate(`/production/${next.id}`),
+    onAdvance: next.tba ? null : () => navigate(`/production/${next.id}`),
     reduced: reduce,
   });
   if (f.trailer) $('#watch-trailer').onclick = () => openTrailer(f);

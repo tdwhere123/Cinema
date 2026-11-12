@@ -52,8 +52,7 @@ export function mountNextProduction(section, { onAdvance, reduced = false }) {
     opts = { signal: abort.signal },
     state = createAdvanceState();
   const meter = section.querySelector('.next-progress'),
-    disc = section.querySelector('.next-disc'),
-    rules = [...section.querySelectorAll('.next-rule')];
+    disc = section.querySelector('.next-disc');
   const physical = disc ? createNextDisc(section, disc) : null;
   let frame,
     previous = performance.now(),
@@ -67,7 +66,9 @@ export function mountNextProduction(section, { onAdvance, reduced = false }) {
     arrivedAt = null;
   const bottom = () =>
     window.scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
-  const allowed = () => !document.querySelector('dialog[open]') && !triggered;
+  // Without onAdvance (no announced film follows) the section is a quiet ending.
+  const allowed = () =>
+    !!onAdvance && !document.querySelector('dialog[open]') && !triggered;
   function paint() {
     section.style.setProperty('--advance', state.progress.toFixed(4));
     meter?.setAttribute('aria-valuenow', Math.round(state.progress * 100));
@@ -152,10 +153,6 @@ export function mountNextProduction(section, { onAdvance, reduced = false }) {
     const charge = state.progress;
     const scatter = reduced ? 1 : clamp(progress * 0.6 + charge * 0.4, 0, 1);
     section.style.setProperty('--scatter', scatter.toFixed(4));
-    rules.forEach((rule, i) => {
-      const threshold = 0.1 + i * 0.16;
-      rule.classList.toggle('visible', reduced || progress >= threshold);
-    });
     spin += (-0.14 + scrollSpeed - charge * 6 - (triggered ? 16 : 0)) * dt;
     if (disc) {
       const exit = exitAt === null ? 0 : clamp((now - exitAt) / 450, 0, 1);

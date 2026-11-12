@@ -240,15 +240,13 @@ try {
   );
   await m.touchscreen.tap(195, 417);
   await idle(m);
-  assert.ok(m.url().endsWith('/production/poetry'));
+  assert.ok(m.url().endsWith('/production/possible-love'));
   assert.ok(
     (await m.locator('.detail-info').evaluate((e) => e.offsetHeight)) < 800,
     'mobile hero stays shorter than the viewport plus apron',
   );
-  assert.equal(await m.locator('.description-section .detail-cta').count(), 1);
-  await m.setViewportSize({ width: 1000, height: 800 });
-  await m.waitForTimeout(200);
-  assert.equal(await m.locator('.detail-info .detail-cta').count(), 1);
+  // Club pages cite sources inside their chapters; the hero carries no link block.
+  assert.equal(await m.locator('.detail-cta').count(), 0);
   await m.goBack();
   await idle(m);
   assert.equal(

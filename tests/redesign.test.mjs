@@ -48,13 +48,24 @@ test('public navigation has only actual topic links and local licensed fonts', a
 });
 
 test('local Chinese font assets are bounded genuine WOFF2 with both upstream notices', async () => {
-  let bytes = 0;
-  for (const name of ['cinema-serif', 'cinema-sans']) {
+  // Reading faces ship as two subsets each (split at U+6400), every file a bounded WOFF2.
+  for (const name of [
+    'cinema-serif',
+    'cinema-sans',
+    'cinema-sans-2',
+    'cinema-kai',
+    'cinema-kai-2',
+    'cinema-brush',
+  ]) {
     const font = await readFile(`assets/fonts/${name}.woff2`);
     assert.equal(font.subarray(0, 4).toString(), 'wOF2');
-    bytes += font.length;
+    assert.ok(font.length < 250000, name);
   }
-  assert.ok(bytes < 250000);
+  const css =
+    (await readFile('src/style.css', 'utf8')) +
+    (await readFile('src/editorial.css', 'utf8'));
+  for (const name of ['cinema-sans-2', 'cinema-kai-2'])
+    assert.match(css, new RegExp(`${name}\\.woff2[^}]*U\\+6400-10FFFF`));
   assert.match(
     await readFile('assets/fonts/Sans-OFL.txt', 'utf8'),
     /SIL OPEN FONT LICENSE/,

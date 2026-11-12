@@ -43,13 +43,23 @@ try {
       assert.equal((await p.locator('#detail h1').textContent()).trim(), title);
       assert.equal(await p.locator('#watch-trailer').count(), 0);
       assert.equal(await p.locator('iframe').count(), 0);
-      // Chapters are story, context and poster; no placeholder notes or viewing prompts.
+      // Chapters are story, context, interview and poster; no placeholders or viewing prompts.
       assert.deepEqual(
         await p
           .locator('.chapter .chapter-name')
           .evaluateAll((n) => n.map((e) => e.textContent)),
-        ['故事', '背景', '海报'],
+        ['故事', '背景', '访谈', '海报'],
       );
+      assert.ok((await p.locator('.chapter-interview .qa').count()) >= 4);
+      assert.equal(
+        await p.locator('.chapter-interview .pull-quote').count(),
+        1,
+      );
+      assert.match(
+        await p.locator('.interview-source a').getAttribute('href'),
+        /^https:\/\/(thefilmstage\.com|www\.electricsheepmagazine\.co\.uk)\//,
+      );
+      assert.equal(await p.locator('.detail-cta').count(), 0);
       assert.equal(await p.locator('.club-reviews, .observation').count(), 0);
       assert.ok(
         (await p.locator('.chapter-rail .rail-tick').count()) >= 5,
@@ -90,7 +100,8 @@ try {
       await p.locator('#scene').getAttribute('data-renderer'),
       'webgl',
     );
-    assert.equal(await p.locator('#counter').textContent(), '2 / 2');
+    // 诗 (2010) was opened last; it leads the release-ordered gallery, before the blank disc.
+    assert.equal(await p.locator('#counter').textContent(), '1 / 3');
     assert.equal(await p.locator('#tv-link').count(), 0);
     await p.locator('#open-current').click();
     await idle(p);

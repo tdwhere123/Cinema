@@ -56,7 +56,9 @@ try {
       ['.title-line', 'Ma Shan Zheng'],
       ['.reading-body h2', 'Ma Shan Zheng'],
       ['.reading-body > p', 'LXGW WenKai TC'],
-      ['.detail-metadata .eyebrow', 'Ma Shan Zheng'],
+      ['.detail-metadata .eyebrow', 'Noto Sans SC'],
+      ['.chapter-name', 'Ma Shan Zheng'],
+      ['.award-event', 'Noto Sans SC'],
       ['.wordmark', 'Rock Salt'],
     ]) {
       const { nodeId } = await cdp.send('DOM.querySelector', {
@@ -96,7 +98,8 @@ try {
     await idle(p);
     assert.equal(await p.locator('#gallery').isVisible(), true);
     assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
-    await p.goto(base + '/production/possible-love/');
+    // Films run in release order: 诗 (2010) leads to 可能的爱 (2026), then the blank disc.
+    await p.goto(base + '/production/poetry/');
     await idle(p);
     await p.locator('.full-poster').scrollIntoViewIfNeeded();
     // At rest the poster is a folded packet drawn by WebGL; the flat image stays hidden.
@@ -149,10 +152,6 @@ try {
         'webgl',
     );
     assert.equal(await p.locator('.next-canvas canvas').count(), 1);
-    assert.equal(
-      await p.locator('.next-section .next-rule.visible').count(),
-      5,
-    );
     assert.ok(
       Number(
         await p
@@ -170,10 +169,10 @@ try {
     );
     await p.locator('.next-target').click({ position: { x: 50, y: 20 } });
     await idle(p);
-    assert.ok(p.url().includes('/production/poetry'));
+    assert.ok(p.url().includes('/production/possible-love'));
     await p.goBack();
     await idle(p);
-    assert.ok(p.url().includes('/production/possible-love'));
+    assert.ok(p.url().includes('/production/poetry'));
     assert.equal(await p.locator('.scene-carry').count(), 0);
     await p.evaluate(() => {
       document.activeElement?.blur();
@@ -181,15 +180,27 @@ try {
     });
     await p.waitForTimeout(500);
     assert.ok(
-      p.url().includes('/production/possible-love'),
+      p.url().includes('/production/poetry'),
       'arrival alone never advances',
     );
     await p.keyboard.press('ArrowDown');
     await p.keyboard.press('ArrowDown');
     await p.keyboard.press('ArrowDown');
     await p.waitForSelector('.next-section.advancing');
-    await p.waitForURL('**/production/poetry');
+    await p.waitForURL('**/production/possible-love');
     await idle(p);
+    // After the last announced film the blank disc is a quiet ending: nothing to advance to.
+    assert.equal(await p.locator('.next-section.next-tba').count(), 1);
+    assert.equal(await p.locator('.next-section a.next-target').count(), 0);
+    await p.evaluate(() => {
+      document.activeElement?.blur();
+      scrollTo(0, document.documentElement.scrollHeight);
+    });
+    await p.waitForTimeout(500);
+    for (let i = 0; i < 4; i++) await p.keyboard.press('ArrowDown');
+    await p.waitForTimeout(700);
+    assert.ok(p.url().includes('/production/possible-love'));
+    assert.equal(await p.locator('.next-section.advancing').count(), 0);
     await p.goBack();
     await idle(p);
     await p.evaluate(() => {

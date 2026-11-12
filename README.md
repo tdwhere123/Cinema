@@ -1,8 +1,8 @@
 # CINEMA / 观影会
 
-静态电影小站：李沧东《可能的爱》《诗》各一张 CD。每部影片一页，分为故事、背景、海报三章，附有来源的中文简介、官方剧照和自制海报。无后台、账户、排期或下载服务。
+静态电影小站：李沧东《诗》《可能的爱》各一张 CD，按上映时间排列，末尾是一张盘面为「？」的空白碟片，代表尚未揭晓的下一部。每部影片一页，分为故事、背景、访谈、海报四章，附有来源的中文简介、官方剧照、导演访谈和自制海报。无后台、账户、排期或下载服务。
 
-交互：首页 CD 可拖动 / 翻转 / 触摸，键盘方向键选片、空格翻面、回车进入。CINEMA 手写字标是唯一常驻导航，悬停、聚焦或轻点时，专题与目录以液体形式从两侧拉出；Escape 收起。详情页剧照以液体边缘随滚动浸出，右侧章节轨标示阅读位置，海报是一封折起的信纸，悬停或轻点展开、移开折回。支持减少动态效果，WebGL 不可用时回退到 CSS。
+交互：首页 CD 可拖动 / 翻转 / 触摸，键盘方向键选片、空格翻面、回车进入。CINEMA 手写字标是唯一常驻导航，悬停、聚焦或轻点时，专题与目录以液体形式从两侧拉出；Escape 收起。详情页剧照以液体边缘随滚动浸出，标题与访谈引语如墨在湿纸上晕开后收干，段落进入视野时轻轻落定；右侧章节轨标示阅读位置，海报是一封折起的信纸，悬停或轻点展开、移开折回。支持减少动态效果，WebGL 不可用时回退到 CSS。
 
 ## 本地运行
 
@@ -41,8 +41,10 @@ npm run test:static  # 需要 python3；构建并在无 SPA 回退的静态服�
 
 ## 编辑内容
 
-- `src/data.js`：两部选片。文字保持独立概述并保留来源 URL；没有的内容不要虚构。
-- `src/club-page.js`：详情页章节、右侧章节轨、手绘标记与段落显影。
+- `src/data.js`：选片与 `released` 上映日期（决定排列顺序），以及 `upcoming` 中尚未揭晓的空白碟片。揭晓时把该片移入 `entries` 并填入真实资料。文字保持独立概述并保留来源 URL；没有的内容不要虚构。
+- `src/interviews.js`：各片的导演访谈，注明原文出处与译文说明（全文或节选）。
+- `src/club-page.js`：详情页章节、右侧章节轨、墨迹晕开与段落落定。
+- `node scripts/tba-disc.mjs`：用 Playwright 与马善政子集重新绘制空白碟片 `assets/tba/disc.webp`。
 - `src/liquid-image.js`：剧照的液体浸出（WebGL2）；`src/paper-reveal.js`：海报折叠（Three.js）；`src/topic-menu.js`：导航的液体展开。
 - `src/editorial.css`：字体、版式与以上效果的样式；`src/style.css`、`src/restoration.css` 为首页与加载动画的基础样式。
 - `npm run posters`：用 Sharp 从 `.do-it/` 原稿重新生成网页衍生图（光盘 cover 裁剪，详情页保留完整竖幅）。原稿只在本地，普通构建不依赖。
@@ -50,4 +52,4 @@ npm run test:static  # 需要 python3；构建并在无 SPA 回退的静态服�
 
 ## 字体
 
-全部为本地 WOFF2 子集：马善政（标题与导航）、霞鹜文楷（正文）、Caveat（英文与数字）、Rock Salt（CINEMA 字标），另有 Noto Serif / Sans SC 作回退与小字。许可与来源见 `assets/fonts/README.md`。修改文案后运行联网维护命令 `node scripts/fonts.mjs` 重新生成子集；未包含的字符使用系统中文字体回退。剧照来源和权利说明见 `assets/film-stills-sources.json`。
+全部为本地 WOFF2 子集，分三种角色：马善政（标题、章节名与引语）、霞鹜文楷（正文与访谈回答）、Noto Sans SC（标签、提问与小字）；Rock Salt 只用于 CINEMA 字标，Caveat 只用于加载计数，Noto Serif SC 作回退。正文字体按 U+6400 分为两个文件，以 `unicode-range` 配对。许可与来源见 `assets/fonts/README.md`。修改文案后运行联网维护命令 `node scripts/fonts.mjs` 重新生成子集；未包含的字符使用系统中文字体回退。剧照来源和权利说明见 `assets/film-stills-sources.json`。

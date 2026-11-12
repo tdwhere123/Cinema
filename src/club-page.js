@@ -1,173 +1,138 @@
 /**
  * Film-club detail chapters and their reading aids:
  * - a right-hand chapter rail (after Kokonut UI's Scroll Index, MIT: ticks sit at their
- *   section's scroll position, the current one is set apart, the name flashes on entry);
- * - hand-drawn marker strokes (after Kokonut UI's Marker Text, MIT: variable-width ink
- *   uncovered along the pen's path);
- * - a scroll-led character reveal for the synopsis (after Magic UI's Text Reveal, MIT).
- * All three are independent vanilla implementations; see NOTICE.md.
+ *   section's scroll position and the current one is set apart);
+ * - ink bleed: display quotes appear the way ink spreads into wet paper, then settle sharp;
+ * - paragraphs settle into place once, as they first enter the page.
+ * All are independent vanilla implementations; see NOTICE.md.
  */
-import { clamp } from './math.js';
+import { clamp, easeOut } from './math.js';
+
+const NUMERALS = ['01', '02', '03', '04', '05', '06'];
+
+function interviewChapter(f, esc) {
+  const v = f.interview;
+  const qa = v.qa
+    .map(
+      (item, i) =>
+        `<div class="qa settle"><div class="qa-q">${item.q.map((p) => `<p>${esc(p)}</p>`).join('')}</div><div class="qa-a">${item.a.map((p) => `<p>${esc(p)}</p>`).join('')}</div></div>${v.pull && v.pull.after === i ? `<blockquote class="pull-quote" data-ink><p>${esc(v.pull.text)}</p><cite>李沧东</cite></blockquote>` : ''}`,
+    )
+    .join('');
+  return `<div class="chapter-body interview-body"><p class="interview-lede settle">${esc(v.lede)}</p>${qa}<p class="fine-print interview-source">原文 · ${esc(v.outlet)} · ${esc(v.author)} · ${esc(v.date)} · <a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.title)} ↗</a><br>${esc(v.translation)}</p></div>`;
+}
 
 export function clubChapters(f, esc) {
   const source = `<a href="${esc(f.source)}" target="_blank" rel="noopener">资料来源 ↗</a>`;
   const still = (src, index, caption, extra = '') =>
-    `<figure class="film-image ${index === 1 ? 'opening-image' : 'interlude-image'}" ${index === 2 ? 'data-chapter="剧照"' : ''}><div class="still-frame"><img class="film-still" ${extra} src="${src}" alt="《${esc(f.title)}》官方影片剧照${index === 2 ? '（二）' : ''}"${index === 2 ? ' loading="lazy"' : ''}></div><figcaption><span class="caption-index">Still 0${index}</span><span class="caption-title">${esc(caption || '')}</span><span class="caption-meta">${esc(f.stillCredit)}</span></figcaption></figure>`;
+    `<figure class="film-image ${index === 1 ? 'opening-image' : 'interlude-image'}" ${index === 2 ? 'data-chapter="剧照"' : ''}><div class="still-frame"><img class="film-still" ${extra} src="${src}" alt="《${esc(f.title)}》官方影片剧照${index === 2 ? '（二）' : ''}"${index === 2 ? ' loading="lazy"' : ''}></div><figcaption><span class="caption-index">剧照 0${index}</span><span class="caption-title">${esc(caption || '')}</span><span class="caption-meta">${esc(f.stillCredit)}</span></figcaption></figure>`;
+  let n = 0;
+  const head = (name) =>
+    `<header class="chapter-head"><span class="chapter-num">${NUMERALS[n++]}</span><span class="chapter-name">${name}</span></header>`;
+  const story = `<section class="chapter chapter-story description-section" data-chapter="故事">${head('故事')}<div class="chapter-body"><p class="story-copy description-copy settle">${esc(f.summary)}</p><p class="fine-print synopsis-credit">独立撰写的影片简介 · ${source}</p></div><aside class="chapter-aside honors awards"><h3 class="aside-title">荣誉</h3><ol>${f.awards.map((a) => `<li class="award-item settle"><span class="award-label">${esc(a.award)}</span><span class="award-event">${esc(a.event)}</span></li>`).join('')}</ol></aside></section>`;
+  const context = `<section class="chapter chapter-context reading-section" data-chapter="背景">${head('背景')}<div class="chapter-body reading-body"><h2 data-ink>${esc(f.contextTitle)}</h2><p class="settle">${esc(f.context)}</p><p class="fine-print reading-source">事实资料 · ${f.id === 'poetry' ? 'Festival de Cannes' : 'Netflix Tudum'} · ${source}</p></div></section>`;
+  const interview = f.interview
+    ? `<section class="chapter chapter-interview" data-chapter="访谈">${head('访谈')}${interviewChapter(f, esc)}</section>`
+    : '';
+  const poster = `<section class="chapter poster-section" data-chapter="海报" aria-label="完整海报">${head('海报')}<div class="chapter-body"><p class="poster-note">一张折起来的纸，指向它，或轻点，它会自己展开。</p><a href="${f.poster}" target="_blank" rel="noopener"><img class="full-poster" src="${f.poster}" alt="《${esc(f.title)}》自制海报（完整画幅）"></a><p class="fine-print poster-caption">自制海报 · <a href="${f.poster}" target="_blank" rel="noopener">查看原图 ↗</a></p></div></section>`;
   return `${still(f.still, 1, f.stillCaption1, 'data-liquid="rise"')}
-<section class="chapter chapter-story description-section" data-chapter="故事"><header class="chapter-head"><span class="chapter-num">01</span><span class="chapter-name">故事</span></header><div class="chapter-body"><p class="story-copy description-copy" data-reveal-text>${esc(f.summary)}</p><p class="fine-print synopsis-credit">独立撰写的影片简介 · ${source}</p></div><aside class="chapter-aside honors awards"><h3 class="aside-title">荣誉</h3><ol>${f.awards.map((a) => `<li class="award-item"><span class="award-label" data-mark="underline">${esc(a.award)}</span><span class="award-event">${esc(a.event)}</span></li>`).join('')}</ol></aside></section>
-<section class="chapter chapter-context reading-section" data-chapter="背景"><header class="chapter-head"><span class="chapter-num">02</span><span class="chapter-name">背景</span></header><div class="chapter-body reading-body"><h2><span data-mark="highlight">${esc(f.contextTitle)}</span></h2><p>${esc(f.context)}</p><p class="fine-print reading-source">事实资料 · ${f.id === 'poetry' ? 'Festival de Cannes' : 'Netflix Tudum'} · ${source}</p></div></section>
+${story}
+${context}
 ${still(f.secondStill, 2, f.stillCaption2)}
-<section class="chapter poster-section" data-chapter="海报" aria-label="完整海报"><header class="chapter-head"><span class="chapter-num">03</span><span class="chapter-name">海报</span></header><div class="chapter-body"><p class="poster-note">一张折起来的纸。把指针放上去，它会自己打开。</p><a href="${f.poster}" target="_blank" rel="noopener"><img class="full-poster" src="${f.poster}" alt="《${esc(f.title)}》自制海报（完整画幅）"></a><p class="fine-print poster-caption">自制海报 · <a href="${f.poster}" target="_blank" rel="noopener">查看原图 ↗</a></p></div></section>`;
+${interview}
+${poster}`;
 }
 
-const hashOf = (text) =>
-  [...text].reduce((h, c) => (h * 31 + c.codePointAt(0)) % 1000003, 7);
-function random(seed) {
-  let n = seed;
-  return () => {
-    n += 1;
-    const x = Math.sin(n * 12.9898 + seed * 78.233) * 43758.5453;
-    return x - Math.floor(x);
-  };
-}
-
-/** A pen line drawn as a filled outline whose width swells and thins like ink. */
-function inkPath(points, widths) {
-  const left = [],
-    right = [];
-  points.forEach((p, i) => {
-    const a = points[Math.max(0, i - 1)],
-      b = points[Math.min(points.length - 1, i + 1)],
-      dx = b[0] - a[0],
-      dy = b[1] - a[1],
-      len = Math.hypot(dx, dy) || 1,
-      h = widths[i] / 2;
-    left.push([p[0] - (dy / len) * h, p[1] + (dx / len) * h]);
-    right.push([p[0] + (dy / len) * h, p[1] - (dx / len) * h]);
-  });
-  const f = (n) => n.toFixed(1);
-  return `M${left.map((p) => `${f(p[0])} ${f(p[1])}`).join('L')}L${right
-    .reverse()
-    .map((p) => `${f(p[0])} ${f(p[1])}`)
-    .join('L')}Z`;
-}
-
-function markShape(type, w, h, seed) {
-  const rand = random(seed),
-    steps = Math.max(8, Math.round(w / 14)),
-    points = [],
-    widths = [];
-  const highlight = type === 'highlight';
-  const y = highlight ? h * 0.62 : h + 3,
-    tilt = (rand() - 0.5) * (highlight ? 4 : 3);
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    points.push([
-      -4 + t * (w + 8),
-      y +
-        tilt * (t - 0.5) +
-        Math.sin(t * Math.PI * (1.5 + rand())) * (highlight ? 1.6 : 1.1),
-    ]);
-    const taper = Math.sin(Math.PI * Math.min(1, t * 1.15 + 0.04));
-    widths.push(
-      (highlight ? h * 0.46 : 2.4) *
-        (0.55 + 0.45 * taper) *
-        (0.9 + rand() * 0.2),
-    );
+/** Paragraphs settle once: a short rise out of a faint blur, staggered within a batch. */
+export function mountSettle(root, { reduced = false } = {}) {
+  const blocks = [...root.querySelectorAll('.settle')];
+  if (reduced || !('IntersectionObserver' in window)) {
+    blocks.forEach((b) => b.classList.add('settled'));
+    return () => {};
   }
-  return {
-    ink: inkPath(points, widths),
-    pen: `M${points.map((p) => p.map((n) => n.toFixed(1)).join(' ')).join('L')}`,
-    width: Math.max(...widths) + 2,
-  };
+  const seen = new IntersectionObserver(
+    (entries) => {
+      let k = 0;
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.style.setProperty('--settle-delay', `${k++ * 90}ms`);
+        e.target.classList.add('settled');
+        seen.unobserve(e.target);
+      }
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.15 },
+  );
+  blocks.forEach((b) => seen.observe(b));
+  return () => seen.disconnect();
 }
 
-export function mountMarkers(root, { reduced = false } = {}) {
-  const marks = [...root.querySelectorAll('[data-mark]')];
-  const draw = () => {
-    for (const el of marks) {
-      el.querySelector(':scope > .ink-mark')?.remove();
-      const w = el.offsetWidth,
-        h = el.offsetHeight;
-      if (!w || !h) continue;
-      const type = el.dataset.mark,
-        shape = markShape(type, w, h, hashOf(el.textContent));
-      const id = `mark-${hashOf(el.textContent + type)}`;
-      el.insertAdjacentHTML(
-        'beforeend',
-        `<svg class="ink-mark" data-type="${type}" aria-hidden="true" width="${w}" height="${h + 8}" viewBox="0 0 ${w} ${h + 8}"><mask id="${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${w + 40}" height="${h + 48}"><path d="${shape.pen}" fill="none" stroke="#fff" stroke-width="${shape.width}" stroke-linecap="round" pathLength="1"/></mask><path d="${shape.ink}" mask="url(#${id})"/></svg>`,
-      );
-      if (el.classList.contains('marked') || reduced)
-        el.querySelector('mask path').style.strokeDashoffset = '0';
-    }
+const SVG = 'http://www.w3.org/2000/svg';
+/**
+ * Ink bleed: an SVG turbulence displacement and blur that relax to zero, so the words
+ * spread like ink on damp paper and then dry crisp. The filter is removed afterwards.
+ */
+export function mountInkBleed(root, { reduced = false } = {}) {
+  const marks = [...root.querySelectorAll('[data-ink]')];
+  if (!marks.length) return () => {};
+  if (reduced || !('IntersectionObserver' in window)) {
+    marks.forEach((m) => m.classList.add('inked'));
+    return () => {};
+  }
+  const defs = document.createElementNS(SVG, 'svg');
+  defs.setAttribute('class', 'ink-defs');
+  defs.setAttribute('aria-hidden', 'true');
+  defs.setAttribute('width', '0');
+  defs.setAttribute('height', '0');
+  const frames = new Set();
+  const setups = marks.map((el, i) => {
+    const id = `ink-bleed-${i}-${Math.random().toString(36).slice(2, 7)}`;
+    defs.insertAdjacentHTML(
+      'beforeend',
+      `<filter id="${id}" x="-15%" y="-40%" width="130%" height="180%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.022 0.05" numOctaves="2" seed="${i + 3}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="spread"/><feGaussianBlur in="spread" stdDeviation="0"/></filter>`,
+    );
+    el.style.filter = `url(#${id})`;
+    el.classList.add('ink-wet');
+    return { el, id };
+  });
+  document.body.append(defs);
+  const play = ({ el, id }) => {
+    const filter = defs.querySelector(`#${id}`),
+      map = filter.querySelector('feDisplacementMap'),
+      blur = filter.querySelector('feGaussianBlur'),
+      start = performance.now(),
+      duration = 1800;
+    el.classList.add('inked');
+    const step = (now) => {
+      frames.delete(raf);
+      const t = clamp((now - start) / duration, 0, 1),
+        e = easeOut(t),
+        rest = 1 - e;
+      map.setAttribute('scale', (34 * rest).toFixed(2));
+      blur.setAttribute('stdDeviation', (3.2 * rest * rest).toFixed(2));
+      if (t < 1) {
+        raf = requestAnimationFrame(step);
+        frames.add(raf);
+      } else {
+        el.style.filter = '';
+        el.classList.remove('ink-wet');
+      }
+    };
+    let raf = requestAnimationFrame(step);
+    frames.add(raf);
   };
-  draw();
   const seen = new IntersectionObserver(
     (entries) =>
-      entries.forEach((e, i) => {
+      entries.forEach((e) => {
         if (!e.isIntersecting) return;
-        e.target.style.setProperty('--mark-delay', `${i * 140}ms`);
-        e.target.classList.add('marked');
         seen.unobserve(e.target);
+        play(setups.find((s) => s.el === e.target));
       }),
-    { threshold: 0.9 },
+    { rootMargin: '0px 0px -18% 0px', threshold: 0.6 },
   );
   marks.forEach((m) => seen.observe(m));
-  let resizeTimer;
-  const onResize = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(draw, 150);
-  };
-  addEventListener('resize', onResize);
-  document.fonts?.ready.then(() => !reduced && draw());
   return () => {
     seen.disconnect();
-    removeEventListener('resize', onResize);
-    clearTimeout(resizeTimer);
-  };
-}
-
-export function mountTextReveal(root, { reduced = false } = {}) {
-  const blocks = [...root.querySelectorAll('[data-reveal-text]')];
-  if (reduced) return () => {};
-  const chars = blocks.map((block) => {
-    const text = block.textContent;
-    block.setAttribute('aria-label', text);
-    block.innerHTML = [...text]
-      .map((c) => `<span class="reveal-char" aria-hidden="true">${c}</span>`)
-      .join('');
-    return [...block.querySelectorAll('.reveal-char')];
-  });
-  let frame = 0;
-  const paint = () => {
-    frame = 0;
-    blocks.forEach((block, b) => {
-      const r = block.getBoundingClientRect(),
-        vh = innerHeight;
-      // Fully inked once the paragraph's last line passes 55% of the viewport.
-      const p = clamp(
-        (vh * 0.88 - r.top) / Math.max(1, r.height + vh * 0.33),
-        0,
-        1,
-      );
-      const list = chars[b],
-        lit = p * (list.length + 12);
-      list.forEach((c, i) => {
-        const o = clamp((lit - i) / 12, 0, 1);
-        c.style.opacity = (0.16 + 0.84 * o).toFixed(3);
-      });
-    });
-  };
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(paint);
-  };
-  addEventListener('scroll', schedule, { passive: true });
-  addEventListener('resize', schedule);
-  schedule();
-  return () => {
-    cancelAnimationFrame(frame);
-    removeEventListener('scroll', schedule);
-    removeEventListener('resize', schedule);
+    frames.forEach((f) => cancelAnimationFrame(f));
+    defs.remove();
   };
 }
 
@@ -191,8 +156,7 @@ export function mountChapterRail(root, { reduced = false } = {}) {
     start = 0,
     end = 1,
     active = -1,
-    frame = 0,
-    flash = 0;
+    frame = 0;
   const measure = () => {
     tops = chapters.map((c) => c.getBoundingClientRect().top + scrollY);
     start = Math.max(0, tops[0] - innerHeight * 0.3);
@@ -226,9 +190,6 @@ export function mountChapterRail(root, { reduced = false } = {}) {
       if (i === now) t.setAttribute('aria-current', 'location');
       else t.removeAttribute('aria-current');
     });
-    nav.classList.add('rail-flash');
-    clearTimeout(flash);
-    flash = setTimeout(() => nav.classList.remove('rail-flash'), 1100);
   };
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(paint);
@@ -254,7 +215,6 @@ export function mountChapterRail(root, { reduced = false } = {}) {
   schedule();
   return () => {
     cancelAnimationFrame(frame);
-    clearTimeout(flash);
     clearTimeout(late);
     removeEventListener('scroll', schedule);
     removeEventListener('resize', remeasure);

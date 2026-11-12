@@ -1,9 +1,12 @@
 /** Club summaries are independent overviews; sources are linked on each film page. */
+import { interviews } from './interviews.js';
 const entries = [
   {
     id: 'possible-love',
     title: '可能的爱',
     year: '2026',
+    // Venice world premiere, September 2026.
+    released: '2026-09',
     cast: ['全度妍', '薛景求', '赵汝贞', '赵寅成'],
     runtime: '167 分钟',
     genre: '关系剧情',
@@ -42,7 +45,7 @@ const entries = [
     stillCaption1: '美玉与家人在窗前——平静日常里的凝视与距离',
     stillCaption2: '夜色中的露天餐桌——两段生活在交谈与沉默间交汇',
     context:
-      '《可能的爱》是李沧东继 2018 年《燃烧》后相隔八年的长片，于 2026 年威尼斯国际电影节世界首映并获评审团大奖银狮奖。Netflix 官方资料将故事起点放在一场葬礼后的重逢与一项关于失业工人的纪录片拍摄：全度妍饰演的美玉与薛景求饰演的丈夫浩石，同赵汝贞饰演的纪录片导演艺智、赵寅成饰演的尚宇形成鲜明对照，记录与被记录的关系逐渐渗入彼此的日常。',
+      '《可能的爱》是李沧东继 2018 年《燃烧》后相隔八年的长片，于 2026 年威尼斯国际电影节世界首映并获评审团大奖银狮奖。Netflix 官方资料将故事起点放在一场葬礼后的重逢与一项关于失业工人的纪录片拍摄：全度妍饰演的美玉与薛景求饰演的丈夫浩锡，同赵汝贞饰演的纪录片导演艺智、赵寅成饰演的尚宇形成鲜明对照，记录与被记录的关系逐渐渗入彼此的日常。',
     contextTitle: '在镜头的两侧',
     reviews: [],
     trailer: null,
@@ -57,6 +60,8 @@ const entries = [
     id: 'poetry',
     title: '诗',
     year: '2010',
+    // South Korean theatrical release.
+    released: '2010-05-13',
     cast: ['尹静姬', '李大卫'],
     runtime: '139 分钟',
     genre: '剧情',
@@ -98,12 +103,25 @@ const entries = [
     ],
   },
 ];
+const resolve = (path) => new URL('..' + path, import.meta.url).href;
 // Resolve only asset fields, not arbitrary strings or external URLs.
-export const catalogue = entries.map((f) => ({
-  ...f,
-  ...Object.fromEntries(
-    ['art', 'still', 'secondStill', 'poster', 'vector']
-      .filter((k) => f[k])
-      .map((k) => [k, new URL('..' + f[k], import.meta.url).href]),
-  ),
-}));
+// Films read in release order; ISO dates (or their prefixes) sort as strings.
+export const catalogue = entries
+  .map((f) => ({
+    ...f,
+    interview: interviews[f.id] || null,
+    ...Object.fromEntries(
+      ['art', 'still', 'secondStill', 'poster', 'vector']
+        .filter((k) => f[k])
+        .map((k) => [k, resolve(f[k])]),
+    ),
+  }))
+  .sort((a, b) => a.released.localeCompare(b.released));
+
+/**
+ * Selections not yet announced: a blank disc in the gallery, without a page of its own.
+ * Revealing one means moving it into `entries` with its real data.
+ */
+export const upcoming = [
+  { id: 'tba-1', tba: true, art: resolve('/assets/tba/disc.webp') },
+];
